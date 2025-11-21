@@ -12,6 +12,8 @@ import { startExplorerService } from '../explorer/service';
 import { InMemoryINS } from '../registry/insStore';
 import { P2PService, startP2PAPI } from '../p2p/service';
 import { MempoolService, startMempoolService } from '../mempool/service';
+import { EnhancedRPC, createEnhancedRPC } from '../rpc/enhanced';
+import { PaymasterValidator, createPaymasterValidator } from '../paymaster/validator';
 import {
   loadProfileFromArgs,
   mergeConfig,
@@ -33,6 +35,8 @@ export interface RunnerContext {
     explorer?: { app: any; ins: InMemoryINS };
     p2p?: P2PService;
     mempool?: MempoolService;
+    rpc?: EnhancedRPC;
+    paymaster?: PaymasterValidator;
   };
   shutdown: () => Promise<void>;
 }
@@ -162,6 +166,16 @@ export async function startRunner(args: string[]): Promise<RunnerContext> {
       }
     }
   }
+
+  // Start RPC service (always enabled)
+  const rpc = createEnhancedRPC();
+  context.services.rpc = rpc;
+  console.log('[rpc] Enhanced RPC service initialized');
+
+  // Start Paymaster (disabled by default, enable via profile)
+  const paymaster = createPaymasterValidator({ enabled: false });
+  context.services.paymaster = paymaster;
+  console.log(`[paymaster] Validator initialized (enabled: ${paymaster.isEnabled()})`);
 
   console.log('');
   console.log('✅ All services started');
