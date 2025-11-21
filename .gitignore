@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+.claude
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Benchmark results
+bench-*.log
+benchmark-report.md
+*.bench.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Chain data (local development)
+data/
+chaindata/
+.chain/
+*.ldb
+*.sst
+
+# P2P state
+peers.json
+.peers/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Vitest
+vitest.config.ts.timestamp*

@@ -1,0 +1,8 @@
+{
+  "name": "v2-small",
+  "description": "1-3 SYS instructions (REG/INIT/UPDATE small patches)",
+  "txType": "v2-small",
+  "txCount": 5000,
+  "concurrency": 32,
+  "rateLimit": null
+}

@@ -1,0 +1,16 @@
+{
+  "description": "SYS.INIT golden vector - initialize state",
+  "dsl": {
+    "creator": "sys",
+    "moduleId": "SYS",
+    "method": "INIT",
+    "args": {
+      "stateId": "0000000000000000000000000000000000000000000000000000000000000001",
+      "expectedVersion": "0000000000000000000000000000000000000000000000000000000000000000",
+      "data": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    }
+  }
+}

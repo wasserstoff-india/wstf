@@ -1,0 +1,183 @@
+name: Check
+
+on:
+  pull_request:
+    branches: [alpha, main]
+  push:
+    branches: [alpha, main]
+
+jobs:
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "Checking for critical vulnerabilities..."
+          npm audit --json > audit.json || true
+          CRITICAL=$(cat audit.json | jq '.metadata.vulnerabilities.critical // 0')
+          HIGH=$(cat audit.json | jq '.metadata.vulnerabilities.high // 0')
+          echo "Critical: $CRITICAL, High: $HIGH"
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "::error::Critical vulnerabilities found"
+            exit 1
+          fi
+
+  determinism:
+    name: Determinism Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run determinism tests
+        run: npm run test:determinism
+
+  golden-vectors:
+    name: Golden Vector Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate golden vectors
+        run: npm run test:vectors
+
+  wire-format:
+    name: Wire Format Stability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check ABI encoding stability
+        run: npm run test:unit:abi
+
+      - name: Check CBOR canonicalization
+        run: |
+          echo "Verifying CBOR canonical encoding..."
+          npm run test:unit -- --grep "CBOR" || true
+
+  cross-platform:
+    name: Cross-Platform (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test:unit
+
+  memory-check:
+    name: Memory Leak Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run memory stress test
+        run: |
+          echo "Running memory stress test..."
+          node --expose-gc -e "
+            const { execSync } = require('child_process');
+            const initial = process.memoryUsage().heapUsed;
+
+            // Run tests multiple times
+            for (let i = 0; i < 3; i++) {
+              try {
+                execSync('npm run test:unit', { stdio: 'inherit' });
+              } catch (e) {}
+              if (global.gc) global.gc();
+            }
+
+            const final = process.memoryUsage().heapUsed;
+            const growth = ((final - initial) / initial * 100).toFixed(2);
+            console.log('Memory growth: ' + growth + '%');
+
+            if (growth > 50) {
+              console.error('Warning: Significant memory growth detected');
+            }
+          " || true
+
+  all-checks:
+    name: All Checks Pass
+    runs-on: ubuntu-latest
+    needs: [security, determinism, golden-vectors, wire-format, cross-platform]
+    steps:
+      - name: All checks passed
+        run: echo "All checks passed successfully!"

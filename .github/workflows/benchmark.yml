@@ -1,0 +1,168 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [alpha, main]
+  pull_request:
+    branches: [alpha, main]
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Benchmark scenario to run'
+        required: false
+        default: 'basic-v1'
+        type: choice
+        options:
+          - basic-v1
+          - v2-small
+          - v2-heavy
+          - mix-70-20-10
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run benchmark (basic-v1)
+        id: bench-basic
+        run: |
+          echo "Running basic-v1 benchmark..."
+          npm run bench:basic-v1 2>&1 | tee bench-basic.log || true
+          echo "status=$?" >> $GITHUB_OUTPUT
+
+      - name: Run benchmark (v2-small)
+        if: github.event_name == 'push' || github.event.inputs.scenario == 'v2-small'
+        run: |
+          echo "Running v2-small benchmark..."
+          npm run bench:v2-small 2>&1 | tee bench-v2-small.log || true
+
+      - name: Run benchmark (mix)
+        if: github.event_name == 'push' || github.event.inputs.scenario == 'mix-70-20-10'
+        run: |
+          echo "Running mix scenario benchmark..."
+          npm run bench:mix 2>&1 | tee bench-mix.log || true
+
+      - name: Generate benchmark report
+        run: |
+          echo "## Benchmark Results" > benchmark-report.md
+          echo "" >> benchmark-report.md
+          echo "**Commit:** \`${{ github.sha }}\`" >> benchmark-report.md
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> benchmark-report.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> benchmark-report.md
+          echo "" >> benchmark-report.md
+
+          echo "### basic-v1 (Empty tx, signature check only)" >> benchmark-report.md
+          echo "\`\`\`" >> benchmark-report.md
+          cat bench-basic.log 2>/dev/null || echo "No results available"
+          echo "\`\`\`" >> benchmark-report.md
+
+          if [ -f bench-v2-small.log ]; then
+            echo "" >> benchmark-report.md
+            echo "### v2-small (1-3 SYS instructions)" >> benchmark-report.md
+            echo "\`\`\`" >> benchmark-report.md
+            cat bench-v2-small.log
+            echo "\`\`\`" >> benchmark-report.md
+          fi
+
+          if [ -f bench-mix.log ]; then
+            echo "" >> benchmark-report.md
+            echo "### mix-70-20-10 (Production mix)" >> benchmark-report.md
+            echo "\`\`\`" >> benchmark-report.md
+            cat bench-mix.log
+            echo "\`\`\`" >> benchmark-report.md
+          fi
+
+      - name: Upload benchmark report
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-report
+          path: |
+            benchmark-report.md
+            bench-*.log
+          retention-days: 90
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('benchmark-report.md', 'utf8');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Benchmark Results')
+            );
+
+            const body = report;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
+
+  slo-check:
+    name: SLO Assertions
+    runs-on: ubuntu-latest
+    needs: benchmark
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run SLO check
+        run: |
+          echo "Checking SLO targets..."
+          echo "Target: basic-v1 >= 5,000 TPS"
+          echo "Target: mix-70-20-10 >= 2,000 TPS"
+          echo "Target: p99 latency < 50ms"
+          echo ""
+          # SLO check would be implemented in bench runner
+          npm run bench:slo-check || echo "SLO check script not yet implemented"

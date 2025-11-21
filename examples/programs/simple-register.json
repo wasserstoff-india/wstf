@@ -1,0 +1,25 @@
+[
+  {
+    "creator": "sys",
+    "moduleId": "SYS",
+    "method": "REG",
+    "args": {
+      "stateId": "0000000000000000000000000000000000000000000000000000000000000001",
+      "type": "example",
+      "owner": "gc2nnxZXUPwtmY9MSmqYzT4ZFGVGsCXapZo5D"
+    }
+  },
+  {
+    "creator": "sys",
+    "moduleId": "SYS",
+    "method": "INIT",
+    "args": {
+      "stateId": "0000000000000000000000000000000000000000000000000000000000000001",
+      "expectedVersion": "0000000000000000000000000000000000000000000000000000000000000000",
+      "data": {
+        "name": "Example State",
+        "description": "This is an example state registration"
+      }
+    }
+  }
+]

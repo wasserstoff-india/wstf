@@ -1,0 +1,8 @@
+{
+  "name": "v2-heavy",
+  "description": "10-50 instructions + larger CBOR payloads",
+  "txType": "v2-heavy",
+  "txCount": 1000,
+  "concurrency": 16,
+  "rateLimit": null
+}

@@ -1,0 +1,13 @@
+{
+  "description": "SYS.REG golden vector - register new state",
+  "dsl": {
+    "creator": "sys",
+    "moduleId": "SYS",
+    "method": "REG",
+    "args": {
+      "stateId": "0000000000000000000000000000000000000000000000000000000000000001",
+      "type": "example",
+      "owner": "gc2nnxZXUPwtmY9MSmqYzT4ZFGVGsCXapZo5D"
+    }
+  }
+}

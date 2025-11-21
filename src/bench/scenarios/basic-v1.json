@@ -1,0 +1,8 @@
+{
+  "name": "basic-v1",
+  "description": "Empty tx, signature check only",
+  "txType": "basic-v1",
+  "txCount": 10000,
+  "concurrency": 64,
+  "rateLimit": null
+}

@@ -1,0 +1,13 @@
+{
+  "name": "mix-70-20-10",
+  "description": "70% v1, 20% v2-small, 10% v2-heavy",
+  "txType": "mix",
+  "distribution": {
+    "basic-v1": 0.7,
+    "v2-small": 0.2,
+    "v2-heavy": 0.1
+  },
+  "txCount": 10000,
+  "concurrency": 64,
+  "rateLimit": null
+}

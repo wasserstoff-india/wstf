@@ -1,0 +1,15 @@
+{
+  "description": "SYS.VERIFY golden vector - signature verification",
+  "dsl": {
+    "creator": "sys",
+    "moduleId": "SYS",
+    "method": "VERIFY",
+    "flags": ["readOnly"],
+    "args": {
+      "algo": "ed25519",
+      "message": "48656c6c6f20576f726c64",
+      "signature": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "publicKeyBase64DER": "MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE="
+    }
+  }
+}

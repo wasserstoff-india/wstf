@@ -1,0 +1,43 @@
+{
+  "name": "wstfchain",
+  "version": "0.1.0",
+  "description": "WSTFChain - A minimal blockchain implementation with multi-algorithm support",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node",
+    "start": "node dist/runner/run.js",
+    "start:m3": "ts-node src/runner/run-m3.ts",
+    "test": "ts-node src/test/smoke.ts",
+    "test:m1": "ts-node src/test/smoke.ts",
+    "test:m2": "ts-node src/test/m2-smoke.ts",
+    "test:m3": "ts-node src/test/m3-smoke.ts",
+    "test:m4": "ts-node src/test/m4-smoke.ts",
+    "test:all": "npm run test:m1 && npm run test:m2 && npm run test:m3 && npm run test:m4",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:full": "npm run test:all && npm run test:unit"
+  },
+  "keywords": [
+    "blockchain",
+    "crypto",
+    "ed25519",
+    "secp256k1"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bs58check": "^4.0.0",
+    "cbor": "^10.0.11",
+    "fastify": "^5.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@vitest/ui": "^4.0.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.12"
+  }
+}
