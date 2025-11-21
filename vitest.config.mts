@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['src/**/*.{test,spec}.{js,ts}'],
+    exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -11,9 +13,11 @@ export default defineConfig({
         'node_modules/',
         'dist/',
         'test/',
+        'src/test/',
         '**/*.spec.ts',
         '**/*.test.ts',
       ],
     },
+    testTimeout: 30000,
   },
 });
