@@ -213,16 +213,6 @@ All errors use stable codes for deterministic behavior:
 
 See [src/common/errors.ts](src/common/errors.ts) for full catalog.
 
-## Documentation
-
-- [Milestone1.md](Milestone1.md) - Core foundation specification
-- [Milestone2.md](Milestone2.md) - Instruction layer specification
-- [Milestone3.md](Milestone3.md) - P2P and mempool architecture
-- [M4-SUMMARY.md](M4-SUMMARY.md) - Block production implementation
-- [M2-HARDENING.md](M2-HARDENING.md) - Test baseline and determinism guarantees
-- [PHASE1-ROADMAP.md](PHASE1-ROADMAP.md) - Phase 1 completion roadmap
-- [PROJECT-STATUS.md](PROJECT-STATUS.md) - Current project status
-
 ## Contributing
 
 1. Fork the repository
