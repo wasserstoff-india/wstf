@@ -12,6 +12,11 @@ export enum MessageType {
   INV = 0x20,
   GET_DATA = 0x21,
   DATA = 0x22,
+  // Headers-first sync messages
+  GET_HEADERS = 0x30,
+  HEADERS = 0x31,
+  GET_BLOCKS = 0x32,
+  BLOCKS = 0x33,
   REJECT = 0xff,
 }
 
@@ -107,6 +112,60 @@ export interface Reject extends BaseMessage {
   rejectType?: MessageType; // Which message type is being rejected
 }
 
+/**
+ * Compact block header for sync
+ */
+export interface CompactHeader {
+  hash: string;
+  parentHash: string;
+  height: string; // bigint as string
+  timestamp: number;
+  target: string;
+  nonce: string; // bigint as string
+  stateRoot: string;
+  txRoot: string;
+}
+
+/**
+ * GetHeaders: Request headers from a locator
+ */
+export interface GetHeaders extends BaseMessage {
+  type: MessageType.GET_HEADERS;
+  /** Block locator hashes (newest first) */
+  locator: string[];
+  /** Stop hash (request headers up to this, or empty for max) */
+  stopHash?: string;
+  /** Max headers to return */
+  maxHeaders?: number;
+}
+
+/**
+ * Headers: Response with block headers
+ */
+export interface Headers extends BaseMessage {
+  type: MessageType.HEADERS;
+  /** Array of compact headers */
+  headers: CompactHeader[];
+}
+
+/**
+ * GetBlocks: Request full blocks by hash
+ */
+export interface GetBlocks extends BaseMessage {
+  type: MessageType.GET_BLOCKS;
+  /** Block hashes to request */
+  hashes: string[];
+}
+
+/**
+ * Blocks: Response with full blocks
+ */
+export interface Blocks extends BaseMessage {
+  type: MessageType.BLOCKS;
+  /** Array of serialized blocks */
+  blocks: any[]; // Serialized Block objects
+}
+
 export type P2PMessage =
   | PeerHello
   | PeerAck
@@ -116,6 +175,10 @@ export type P2PMessage =
   | Inv
   | GetData
   | Data
+  | GetHeaders
+  | Headers
+  | GetBlocks
+  | Blocks
   | Reject;
 
 /**
@@ -231,5 +294,51 @@ export function createReject(code: string, reason: string, rejectType?: MessageT
     code,
     reason,
     rejectType
+  };
+}
+
+/**
+ * Helper: Create a GetHeaders message
+ */
+export function createGetHeaders(locator: string[], stopHash?: string, maxHeaders?: number): GetHeaders {
+  return {
+    type: MessageType.GET_HEADERS,
+    timestamp: Date.now(),
+    locator,
+    stopHash,
+    maxHeaders
+  };
+}
+
+/**
+ * Helper: Create a Headers message
+ */
+export function createHeaders(headers: CompactHeader[]): Headers {
+  return {
+    type: MessageType.HEADERS,
+    timestamp: Date.now(),
+    headers
+  };
+}
+
+/**
+ * Helper: Create a GetBlocks message
+ */
+export function createGetBlocks(hashes: string[]): GetBlocks {
+  return {
+    type: MessageType.GET_BLOCKS,
+    timestamp: Date.now(),
+    hashes
+  };
+}
+
+/**
+ * Helper: Create a Blocks message
+ */
+export function createBlocks(blocks: any[]): Blocks {
+  return {
+    type: MessageType.BLOCKS,
+    timestamp: Date.now(),
+    blocks
   };
 }

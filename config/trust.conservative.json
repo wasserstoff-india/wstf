@@ -1,0 +1,38 @@
+{
+  "name": "conservative",
+  "description": "Conservative policy that prioritizes safety over speed",
+  "thresholds": {
+    "instantAccept": 95,
+    "softConfirm": 85,
+    "hardConfirm": 70
+  },
+  "kDepth": {
+    "default": 12,
+    "highTrust": 6,
+    "lowTrust": 24
+  },
+  "valueThresholds": {
+    "low": "100",
+    "medium": "10000"
+  },
+  "rules": [
+    {
+      "name": "highest-trust-tiny-value",
+      "minTrustScore": 95,
+      "maxValue": "100",
+      "actionRisk": ["low"],
+      "requiredTier": 2
+    },
+    {
+      "name": "any-risk-above-low",
+      "actionRisk": ["medium", "high"],
+      "requiredTier": 4
+    },
+    {
+      "name": "any-high-value",
+      "minValue": "10000",
+      "requiredTier": 4
+    }
+  ],
+  "defaultTier": 3
+}

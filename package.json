@@ -13,12 +13,17 @@
     "test:m2": "ts-node src/test/m2-smoke.ts",
     "test:m3": "ts-node src/test/m3-smoke.ts",
     "test:m4": "ts-node src/test/m4-smoke.ts",
-    "test:all": "npm run test:m1 && npm run test:m2 && npm run test:m3 && npm run test:m4",
+    "test:m5": "ts-node src/test/fastpath-smoke.ts",
+    "test:fastpath": "ts-node src/test/fastpath-smoke.ts",
+    "test:all": "npm run test:m1 && npm run test:m2 && npm run test:m3 && npm run test:m4 && npm run test:m5",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:full": "npm run test:all && npm run test:unit"
+    "test:full": "npm run test:all && npm run test:unit",
+    "bench": "ts-node src/bench/bench.ts",
+    "bench:slo": "ts-node src/bench/slo-bench.ts",
+    "start:unified": "ts-node src/runner/unified.ts"
   },
   "keywords": [
     "blockchain",

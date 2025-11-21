@@ -159,10 +159,8 @@ jobs:
 
       - name: Run SLO check
         run: |
-          echo "Checking SLO targets..."
-          echo "Target: basic-v1 >= 5,000 TPS"
-          echo "Target: mix-70-20-10 >= 2,000 TPS"
-          echo "Target: p99 latency < 50ms"
-          echo ""
-          # SLO check would be implemented in bench runner
-          npm run bench:slo-check || echo "SLO check script not yet implemented"
+          echo "## SLO Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          npm run bench:slo 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

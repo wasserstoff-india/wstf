@@ -81,7 +81,7 @@ export class MetricsCollector {
         return null;
       }
 
-      const metrics = await response.json();
+      const metrics = await response.json() as ServiceMetrics['metrics'];
 
       const snapshot: ServiceMetrics = {
         service: serviceName,

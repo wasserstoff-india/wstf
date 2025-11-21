@@ -132,7 +132,7 @@ async function submitTx(target: string, endpoint: string, tx: any): Promise<{ ok
     });
 
     const latency = Date.now() - start;
-    const result = await response.json();
+    const result = await response.json() as { ok?: boolean; code?: string };
 
     return {
       ok: result.ok || false,

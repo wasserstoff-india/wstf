@@ -6,7 +6,8 @@ import { verifyPoW, validateBlockTime } from '../block/pow';
 import { computeTxRoot, computeEffectsRoot } from '../block/merkle';
 import { ChainStore } from './store';
 import { ForkChoice } from './forkChoice';
-import { executeProgram, ExecutionContext } from '../executor/engine';
+import { executeProgram } from '../executor/engine';
+import { ExecutionContext } from '../executor/types';
 import { validateTxV2 } from '../validator/txV2Validator';
 import { validateBasicTx } from '../validator/basicValidator';
 import * as errors from '../common/errors';
@@ -203,7 +204,7 @@ export class BlockValidator {
         // Apply writes to state
         if (execResult.success) {
           for (const write of execResult.writes) {
-            this.deps.stateStore.set(write.stateId, write.data);
+            this.deps.stateStore.set(write.stateId, write.value);
           }
         }
       } else {

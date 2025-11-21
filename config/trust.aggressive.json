@@ -1,0 +1,40 @@
+{
+  "name": "aggressive",
+  "description": "Aggressive policy that prioritizes speed (use with caution)",
+  "thresholds": {
+    "instantAccept": 70,
+    "softConfirm": 50,
+    "hardConfirm": 30
+  },
+  "kDepth": {
+    "default": 3,
+    "highTrust": 1,
+    "lowTrust": 6
+  },
+  "valueThresholds": {
+    "low": "10000",
+    "medium": "1000000"
+  },
+  "rules": [
+    {
+      "name": "any-trust-low-risk-low-value",
+      "minTrustScore": 50,
+      "maxValue": "10000",
+      "actionRisk": ["low"],
+      "requiredTier": 1
+    },
+    {
+      "name": "good-trust-medium-value",
+      "minTrustScore": 70,
+      "maxValue": "1000000",
+      "actionRisk": ["low", "medium"],
+      "requiredTier": 2
+    },
+    {
+      "name": "high-risk-only",
+      "actionRisk": ["high"],
+      "requiredTier": 3
+    }
+  ],
+  "defaultTier": 2
+}

@@ -1,0 +1,52 @@
+{
+  "name": "balanced",
+  "description": "Balanced policy with reasonable defaults for most use cases",
+  "thresholds": {
+    "instantAccept": 90,
+    "softConfirm": 70,
+    "hardConfirm": 50
+  },
+  "kDepth": {
+    "default": 6,
+    "highTrust": 2,
+    "lowTrust": 12
+  },
+  "valueThresholds": {
+    "low": "1000",
+    "medium": "100000"
+  },
+  "rules": [
+    {
+      "name": "high-trust-low-value",
+      "minTrustScore": 90,
+      "maxValue": "1000",
+      "actionRisk": ["low"],
+      "requiredTier": 1
+    },
+    {
+      "name": "high-trust-medium-value",
+      "minTrustScore": 90,
+      "maxValue": "100000",
+      "actionRisk": ["low", "medium"],
+      "requiredTier": 2
+    },
+    {
+      "name": "medium-trust-low-value",
+      "minTrustScore": 70,
+      "maxValue": "1000",
+      "actionRisk": ["low"],
+      "requiredTier": 2
+    },
+    {
+      "name": "high-risk-always",
+      "actionRisk": ["high"],
+      "requiredTier": 4
+    },
+    {
+      "name": "high-value-always",
+      "minValue": "100000",
+      "requiredTier": 3
+    }
+  ],
+  "defaultTier": 3
+}
