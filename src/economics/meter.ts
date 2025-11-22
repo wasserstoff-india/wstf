@@ -82,6 +82,66 @@ export function costOfInstruction(ins: GasInstruction, schedule: GasSchedule): G
     case 'SYS.TRANSFER':
       return schedule.ops.SYS_TRANSFER;
 
+    // Token operations
+    case 'SYS.TOK_DEPLOY':
+      return schedule.ops.TOK_DEPLOY;
+
+    case 'SYS.TOK_MINT':
+      return schedule.ops.TOK_MINT;
+
+    case 'SYS.TOK_BURN':
+      return schedule.ops.TOK_BURN;
+
+    case 'SYS.TOK_TRANSFER':
+      return schedule.ops.TOK_TRANSFER;
+
+    case 'SYS.TOK_APPROVE':
+      return schedule.ops.TOK_APPROVE;
+
+    case 'SYS.TOK_TRANSFER_FROM':
+      return schedule.ops.TOK_TRANSFER_FROM;
+
+    case 'SYS.TOK_PAUSE':
+    case 'SYS.TOK_UNPAUSE':
+      return schedule.ops.TOK_PAUSE;
+
+    case 'SYS.TOK_GET':
+    case 'SYS.TOK_BALANCE':
+    case 'SYS.TOK_ALLOWANCE':
+      return schedule.ops.TOK_GET;
+
+    case 'SYS.NFT_CREATE_CLASS':
+      return schedule.ops.NFT_CREATE_CLASS;
+
+    case 'SYS.NFT_SET_APPROVAL_ALL':
+      return schedule.ops.NFT_SET_APPROVAL_ALL;
+
+    // Variable store operations
+    case 'SYS.VAR_GET':
+      return schedule.ops.VAR_GET;
+
+    case 'SYS.VAR_SET': {
+      const size = BigInt(ins.args?.dataSize ?? 0);
+      return schedule.ops.VAR_SET.base + schedule.ops.VAR_SET.perByte * size;
+    }
+
+    case 'SYS.VAR_DELETE':
+      return schedule.ops.VAR_DELETE;
+
+    case 'SYS.VAR_LIST': {
+      const resultCount = BigInt(ins.args?.dataSize ?? 10); // Use dataSize as result count hint
+      return schedule.ops.VAR_LIST.base + schedule.ops.VAR_LIST.perResult * resultCount;
+    }
+
+    case 'SYS.VAR_NS_CREATE':
+      return schedule.ops.VAR_NS_CREATE;
+
+    case 'SYS.VAR_NS_GRANT':
+      return schedule.ops.VAR_NS_GRANT;
+
+    case 'SYS.VAR_NS_REVOKE':
+      return schedule.ops.VAR_NS_REVOKE;
+
     default:
       // Unknown instruction - charge base
       return schedule.base;

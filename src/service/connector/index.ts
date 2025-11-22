@@ -5,4 +5,5 @@
  */
 
 export * from './connector';
+export * from './gate';
 export * from './moodGame';
