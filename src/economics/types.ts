@@ -25,6 +25,12 @@ export interface GasSchedule {
     SYS_VERIFY_SECP256K1: Gas;
     SYS_SIGN_CHECK: Gas;
     SYS_TRANSFER: Gas;
+    /** Event emission gas costs */
+    SYS_EVENT: { base: Gas; perTopic: Gas; perDataByte: Gas };
+    /** Call local intent gas costs */
+    SYS_CALL_LOCAL: { base: Gas; perPayloadByte: Gas };
+    /** Call result logging gas costs */
+    SYS_CALL_RESULT: { base: Gas; perPreviewByte: Gas };
   };
 }
 
@@ -44,6 +50,10 @@ export const DEFAULT_GAS_SCHEDULE: GasSchedule = {
     SYS_VERIFY_SECP256K1: 1200n,
     SYS_SIGN_CHECK: 200n,
     SYS_TRANSFER: 300n,
+    // Event & runner operations
+    SYS_EVENT: { base: 375n, perTopic: 32n, perDataByte: 1n },
+    SYS_CALL_LOCAL: { base: 500n, perPayloadByte: 2n },
+    SYS_CALL_RESULT: { base: 400n, perPreviewByte: 1n },
   },
 };
 

@@ -3,7 +3,8 @@ import {
   ExecutionContext,
   ExecutionEffects,
   ModuleRegistration,
-  ExecLog
+  ExecLog,
+  PendingEventLog,
 } from './types';
 import { validateReads, checkAuthority } from './authority';
 
@@ -42,6 +43,7 @@ export async function executeProgram(
   const effects: ExecutionEffects = {
     writes: [],
     logs: [],
+    eventLogs: [],
     success: false,
   };
 
@@ -130,4 +132,14 @@ export function addLog(
   data?: any
 ): void {
   effects.logs.push({ level, message, data });
+}
+
+/**
+ * Helper to add an event log
+ */
+export function addEventLog(
+  effects: ExecutionEffects,
+  event: PendingEventLog
+): void {
+  effects.eventLogs.push(event);
 }
