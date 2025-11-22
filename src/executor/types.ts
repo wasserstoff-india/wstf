@@ -1,4 +1,5 @@
 import { InstructionRecord } from '../instructions/abi';
+import { EventLog, EventKey, Topic, EventData, Hex32 } from '../events/logs/types';
 
 /**
  * State identifier (32 bytes)
@@ -30,13 +31,31 @@ export interface ExecLog {
 }
 
 /**
+ * Pending event log (before block context is known)
+ */
+export interface PendingEventLog {
+  /** Module that emitted the event */
+  module: string;
+  /** Event key/signature */
+  key: EventKey;
+  /** Indexed topics */
+  topics: Topic[];
+  /** Raw event data */
+  data: EventData;
+}
+
+/**
  * Execution effects (output of executor)
  */
 export interface ExecutionEffects {
   writes: StateWrite[];
   logs: ExecLog[];
+  /** Event logs emitted during execution */
+  eventLogs: PendingEventLog[];
   success: boolean;
   error?: string;
+  /** Gas consumed during execution */
+  gasUsed?: bigint;
 }
 
 /**

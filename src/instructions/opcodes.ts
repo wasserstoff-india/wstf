@@ -22,6 +22,16 @@ export const SYS_SELECTORS = {
   SIGN: 0x00000005,
   VERIFY: 0x00000006,
   XVAL: 0x00000007,
+  // Event & Instruction Runner selectors (M6)
+  EVENT: 0x00000008,       // Emit event log
+  CALL_LOCAL: 0x00000009,  // Request local program execution
+  CALL_RESULT: 0x0000000a, // Log result of local execution
+  // Program Registry selectors (M7)
+  PROG_REGISTER: 0x0000000b,     // Register a new program
+  PROG_UPDATE: 0x0000000c,       // Update program metadata/policy
+  PROG_QUERY: 0x0000000d,        // Query program registration
+  PROG_CHECK_ACCESS: 0x0000000e, // Check caller access
+  PROG_RECORD_CALL: 0x0000000f,  // Record program call stats
 } as const;
 
 export type SysOpcode = keyof typeof SYS_SELECTORS;
