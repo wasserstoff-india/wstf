@@ -11,6 +11,19 @@ import { TokenHandler, createTokenHandler, TokenHandlerContext } from '../tokens
 import { makeTokenId, makeTokenClassId, TokenId, TokenClassId } from '../tokens/types';
 import { InMemoryVarStore, createVarStore, VarStore } from '../vars/store';
 import { orgNamespace, accountNamespace, VarNamespace, makeKey, encodeValue } from '../vars/types';
+import { InMemoryMarketStore } from '../markets/store';
+import {
+  makeMarketId,
+  makeOrderId,
+  makeGridId,
+  makeTradeId,
+  MarketId,
+  Market,
+  Order,
+  PriceLevel,
+  LiquidityGrid,
+  GEOM_RATIO_SCALE,
+} from '../markets/types';
 
 // ============================================================================
 // Benchmark Types
@@ -454,6 +467,314 @@ export async function runVarBenchmarks(iterations = 1000): Promise<MicroBenchSui
 }
 
 // ============================================================================
+// Market Benchmarks
+// ============================================================================
+
+export async function runMarketBenchmarks(iterations = 1000): Promise<MicroBenchSuite> {
+  const results: MicroBenchResult[] = [];
+  const suiteStart = performance.now();
+
+  const baseToken = makeTokenId('BASE');
+  const quoteToken = makeTokenId('QUOTE');
+  const user1 = 'user1';
+
+  // Benchmark: Market Create
+  {
+    const store = new InMemoryMarketStore();
+    let nonce = 0;
+
+    results.push(await runMicroBench('market.create', iterations, async () => {
+      const marketId = makeMarketId(makeTokenId(`BASE${nonce}`), makeTokenId(`QUOTE${nonce}`));
+      await store.createMarket({
+        marketId,
+        baseTokenId: makeTokenId(`BASE${nonce}`),
+        quoteTokenId: makeTokenId(`QUOTE${nonce++}`),
+        tickSize: 1n,
+        lotSize: 1n,
+        feeBps: 30,
+        status: 'active',
+        creator: user1,
+        createdAtHeight: 1n,
+        version: 1n,
+      });
+    }));
+  }
+
+  // Benchmark: Order Create
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    let nonce = 0n;
+
+    results.push(await runMicroBench('market.order.create', iterations, async () => {
+      const orderId = makeOrderId(marketId, user1, nonce++);
+      await store.createOrder({
+        orderId,
+        marketId,
+        owner: user1,
+        side: 'bid',
+        price: 1000n,
+        size: 100n,
+        remaining: 100n,
+        status: 'open',
+        createdAt: 1n,
+        flags: [],
+        version: 1n,
+      });
+    }));
+  }
+
+  // Benchmark: Order Get
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    const orderId = makeOrderId(marketId, user1, 1n);
+    await store.createOrder({
+      orderId,
+      marketId,
+      owner: user1,
+      side: 'bid',
+      price: 1000n,
+      size: 100n,
+      remaining: 100n,
+      status: 'open',
+      createdAt: 1n,
+      flags: [],
+      version: 1n,
+    });
+
+    results.push(await runMicroBench('market.order.get', iterations * 10, async () => {
+      await store.getOrder(orderId);
+    }));
+  }
+
+  // Benchmark: Price Level Set
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    let price = 0n;
+
+    results.push(await runMicroBench('market.level.set', iterations, async () => {
+      await store.setLevel({
+        marketId,
+        side: 'bid',
+        price: price++,
+        aggregate: 100n,
+        orderIds: [makeOrderId(marketId, user1, price)],
+        version: 1n,
+      });
+    }));
+  }
+
+  // Benchmark: Get Levels by Market (sorted)
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+
+    // Pre-populate 100 levels
+    for (let i = 0; i < 100; i++) {
+      await store.setLevel({
+        marketId,
+        side: 'bid',
+        price: BigInt(1000 + i),
+        aggregate: 100n,
+        orderIds: [makeOrderId(marketId, user1, BigInt(i))],
+        version: 1n,
+      });
+    }
+
+    results.push(await runMicroBench('market.level.list.100', iterations, async () => {
+      await store.getLevelsByMarket(marketId, 'bid', 10);
+    }));
+  }
+
+  // Benchmark: Escrow Adjust
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+
+    results.push(await runMicroBench('market.escrow.adjust', iterations, async () => {
+      await store.adjustEscrow(marketId, user1, baseToken, 100n);
+    }));
+  }
+
+  // Benchmark: Trade Record
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    let tradeNum = 0;
+
+    results.push(await runMicroBench('market.trade.record', iterations, async () => {
+      const tradeId = makeTradeId(marketId, BigInt(tradeNum), 0);
+      await store.recordTrade({
+        tradeId,
+        marketId,
+        makerOrderId: makeOrderId(marketId, user1, 1n),
+        makerAddress: user1,
+        takerOrderId: makeOrderId(marketId, 'user2', 1n),
+        takerAddress: 'user2',
+        side: 'bid',
+        price: 1000n,
+        size: 100n,
+        quoteAmount: 100000n,
+        takerFee: 30n,
+        makerFee: 0n,
+        height: BigInt(tradeNum++),
+        timestamp: 1000n,
+      });
+    }));
+  }
+
+  // Benchmark: Grid Create
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    let nonce = 0n;
+
+    results.push(await runMicroBench('market.grid.create', iterations, async () => {
+      const gridId = makeGridId(marketId, user1, nonce++);
+      await store.createGrid({
+        gridId,
+        marketId,
+        owner: user1,
+        centerPrice: 1000n,
+        halfWidth: 100n,
+        levelsPerSide: 10,
+        mode: 'arith',
+        totalBaseSize: 1000n,
+        sideBias: 'both',
+        status: 'active',
+        orderIds: [],
+        createdAt: 1n,
+        version: 1n,
+      });
+    }));
+  }
+
+  // Benchmark: Top of Book Update
+  {
+    const store = new InMemoryMarketStore();
+    const marketId = makeMarketId(baseToken, quoteToken);
+    await store.createMarket({
+      marketId,
+      baseTokenId: baseToken,
+      quoteTokenId: quoteToken,
+      tickSize: 1n,
+      lotSize: 1n,
+      feeBps: 30,
+      status: 'active',
+      creator: user1,
+      createdAtHeight: 1n,
+      version: 1n,
+    });
+    let version = 1n;
+
+    results.push(await runMicroBench('market.topofbook.set', iterations, async () => {
+      await store.setTopOfBook({
+        marketId,
+        bestBidPrice: 999n,
+        bestAskPrice: 1001n,
+        lastTradePrice: 1000n,
+        lastTradeHeight: 1n,
+        version: version++,
+      });
+    }));
+  }
+
+  const suiteEnd = performance.now();
+
+  return {
+    name: 'Market Operations',
+    results,
+    totalDurationMs: suiteEnd - suiteStart,
+  };
+}
+
+// ============================================================================
 // Combined Benchmark Suite
 // ============================================================================
 
@@ -462,6 +783,7 @@ export async function runAllMicroBenchmarks(iterations = 1000): Promise<MicroBen
 
   suites.push(await runTokenBenchmarks(iterations));
   suites.push(await runVarBenchmarks(iterations));
+  suites.push(await runMarketBenchmarks(iterations));
 
   return suites;
 }

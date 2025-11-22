@@ -79,6 +79,18 @@ export const SYS_SELECTORS = {
   VAR_NS_CREATE: 0x00000054,     // Create namespace
   VAR_NS_GRANT: 0x00000055,      // Grant namespace permission
   VAR_NS_REVOKE: 0x00000056,     // Revoke namespace permission
+
+  // Market/Orderbook selectors (0x60+)
+  MKT_CREATE: 0x00000060,        // Create new market
+  MKT_ORDER_PLACE: 0x00000061,   // Place limit order
+  MKT_ORDER_CANCEL: 0x00000062,  // Cancel order
+  MKT_ORDER_MATCH: 0x00000063,   // Execute matching (bounded)
+  MKT_GRID_CREATE: 0x00000064,   // Create liquidity grid
+  MKT_GRID_UPDATE: 0x00000065,   // Update liquidity grid
+  MKT_GRID_CANCEL: 0x00000066,   // Cancel liquidity grid
+  MKT_GET_MARKET: 0x00000067,    // Get market info (read-only)
+  MKT_GET_BOOK: 0x00000068,      // Get orderbook (read-only)
+  MKT_GET_TRADES: 0x00000069,    // Get trade history (read-only)
 } as const;
 
 export type SysOpcode = keyof typeof SYS_SELECTORS;
