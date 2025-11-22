@@ -21,6 +21,29 @@ import {
   handlePROG_CHECK_ACCESS,
   handlePROG_RECORD_CALL,
 } from './sys-prog';
+import {
+  // M8: Org/RBAC handlers
+  handleORG_CREATE,
+  handleORG_UPDATE,
+  handleORG_ROLE_CREATE,
+  handleORG_ROLE_UPDATE,
+  handleORG_UNIT_CREATE,
+  handleORG_UNIT_UPDATE,
+  handleORG_MEMBER_ADD,
+  handleORG_MEMBER_UPDATE,
+  handleORG_MEMBER_REMOVE,
+  handleORG_CHECK_PERM,
+} from './sys-org';
+import {
+  // M8: Approval handlers
+  handleAPPROVAL_POLICY_CREATE,
+  handleAPPROVAL_POLICY_UPDATE,
+  handleAPPROVAL_REQUEST,
+  handleAPPROVAL_SIGN,
+  handleAPPROVAL_REJECT,
+  handleAPPROVAL_CANCEL,
+  handleAPPROVAL_EXECUTE,
+} from './sys-approval';
 
 /**
  * Register all built-in SYS modules
@@ -148,5 +171,145 @@ export function registerSystemModules(): void {
     moduleId: SYS_MODULE_ID,
     selector: SYS_SELECTORS.PROG_RECORD_CALL,
     handler: handlePROG_RECORD_CALL
+  });
+
+  // M8: Org/RBAC opcodes
+
+  // ORG_CREATE - Create organization
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_CREATE,
+    handler: handleORG_CREATE
+  });
+
+  // ORG_UPDATE - Update organization
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_UPDATE,
+    handler: handleORG_UPDATE
+  });
+
+  // ORG_ROLE_CREATE - Create role in org
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_ROLE_CREATE,
+    handler: handleORG_ROLE_CREATE
+  });
+
+  // ORG_ROLE_UPDATE - Update role
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_ROLE_UPDATE,
+    handler: handleORG_ROLE_UPDATE
+  });
+
+  // ORG_UNIT_CREATE - Create org unit
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_UNIT_CREATE,
+    handler: handleORG_UNIT_CREATE
+  });
+
+  // ORG_UNIT_UPDATE - Update org unit
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_UNIT_UPDATE,
+    handler: handleORG_UNIT_UPDATE
+  });
+
+  // ORG_MEMBER_ADD - Add member to org
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_MEMBER_ADD,
+    handler: handleORG_MEMBER_ADD
+  });
+
+  // ORG_MEMBER_UPDATE - Update member roles
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_MEMBER_UPDATE,
+    handler: handleORG_MEMBER_UPDATE
+  });
+
+  // ORG_MEMBER_REMOVE - Remove member from org
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_MEMBER_REMOVE,
+    handler: handleORG_MEMBER_REMOVE
+  });
+
+  // ORG_CHECK_PERM - Check permission
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.ORG_CHECK_PERM,
+    handler: handleORG_CHECK_PERM
+  });
+
+  // M8: Approval opcodes
+
+  // APPROVAL_POLICY_CREATE - Create approval policy
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_POLICY_CREATE,
+    handler: handleAPPROVAL_POLICY_CREATE
+  });
+
+  // APPROVAL_POLICY_UPDATE - Update approval policy
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_POLICY_UPDATE,
+    handler: handleAPPROVAL_POLICY_UPDATE
+  });
+
+  // APPROVAL_REQUEST - Create approval request
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_REQUEST,
+    handler: handleAPPROVAL_REQUEST
+  });
+
+  // APPROVAL_SIGN - Sign approval
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_SIGN,
+    handler: handleAPPROVAL_SIGN
+  });
+
+  // APPROVAL_REJECT - Reject approval
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_REJECT,
+    handler: handleAPPROVAL_REJECT
+  });
+
+  // APPROVAL_CANCEL - Cancel approval
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_CANCEL,
+    handler: handleAPPROVAL_CANCEL
+  });
+
+  // APPROVAL_EXECUTE - Execute approved action
+  registerModule({
+    creatorPkHash: SYS_CREATOR_PKHASH,
+    moduleId: SYS_MODULE_ID,
+    selector: SYS_SELECTORS.APPROVAL_EXECUTE,
+    handler: handleAPPROVAL_EXECUTE
   });
 }

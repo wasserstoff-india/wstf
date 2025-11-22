@@ -31,6 +31,25 @@ export interface GasSchedule {
     SYS_CALL_LOCAL: { base: Gas; perPayloadByte: Gas };
     /** Call result logging gas costs */
     SYS_CALL_RESULT: { base: Gas; perPreviewByte: Gas };
+    /** Token operation gas costs */
+    TOK_DEPLOY: Gas;
+    TOK_MINT: Gas;
+    TOK_BURN: Gas;
+    TOK_TRANSFER: Gas;
+    TOK_APPROVE: Gas;
+    TOK_TRANSFER_FROM: Gas;
+    TOK_PAUSE: Gas;
+    TOK_GET: Gas;
+    NFT_CREATE_CLASS: Gas;
+    NFT_SET_APPROVAL_ALL: Gas;
+    /** Variable store gas costs */
+    VAR_GET: Gas;
+    VAR_SET: { base: Gas; perByte: Gas };
+    VAR_DELETE: Gas;
+    VAR_LIST: { base: Gas; perResult: Gas };
+    VAR_NS_CREATE: Gas;
+    VAR_NS_GRANT: Gas;
+    VAR_NS_REVOKE: Gas;
   };
 }
 
@@ -54,6 +73,25 @@ export const DEFAULT_GAS_SCHEDULE: GasSchedule = {
     SYS_EVENT: { base: 375n, perTopic: 32n, perDataByte: 1n },
     SYS_CALL_LOCAL: { base: 500n, perPayloadByte: 2n },
     SYS_CALL_RESULT: { base: 400n, perPreviewByte: 1n },
+    // Token operations
+    TOK_DEPLOY: 50000n,
+    TOK_MINT: 30000n,
+    TOK_BURN: 25000n,
+    TOK_TRANSFER: 20000n,
+    TOK_APPROVE: 15000n,
+    TOK_TRANSFER_FROM: 20000n,
+    TOK_PAUSE: 10000n,
+    TOK_GET: 5000n,
+    NFT_CREATE_CLASS: 25000n,
+    NFT_SET_APPROVAL_ALL: 15000n,
+    // Variable store operations
+    VAR_GET: 5000n,
+    VAR_SET: { base: 10000n, perByte: 10n },
+    VAR_DELETE: 8000n,
+    VAR_LIST: { base: 5000n, perResult: 100n },
+    VAR_NS_CREATE: 20000n,
+    VAR_NS_GRANT: 15000n,
+    VAR_NS_REVOKE: 10000n,
   },
 };
 
