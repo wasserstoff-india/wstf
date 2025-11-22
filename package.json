@@ -8,6 +8,7 @@
     "dev": "ts-node",
     "start": "node dist/runner/run.js",
     "start:m3": "ts-node src/runner/run-m3.ts",
+    "start:unified": "ts-node src/runner/unified.ts",
     "test": "ts-node src/test/smoke.ts",
     "test:m1": "ts-node src/test/smoke.ts",
     "test:m2": "ts-node src/test/m2-smoke.ts",
@@ -21,9 +22,15 @@
     "test:unit:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:full": "npm run test:all && npm run test:unit",
+    "test:determinism": "vitest run src/integration/determinism.test.ts",
+    "test:vectors": "vitest run src/instructions/instructions.test.ts",
+    "test:chaos": "vitest run src/auth/wstf.chaos.test.ts src/service/connector/connector.chaos.test.ts src/service/connector/moodGame.test.ts",
+    "lint": "tsc --noEmit",
     "bench": "ts-node src/bench/bench.ts",
     "bench:slo": "ts-node src/bench/slo-bench.ts",
-    "start:unified": "ts-node src/runner/unified.ts"
+    "bench:basic-v1": "ts-node src/bench/bench.ts --scenario=basic-v1",
+    "bench:v2-small": "ts-node src/bench/bench.ts --scenario=v2-small",
+    "bench:mix": "ts-node src/bench/bench.ts --scenario=mix"
   },
   "keywords": [
     "blockchain",
