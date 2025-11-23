@@ -1,0 +1,51 @@
+{
+  "name": "@wasserstoff/wstf-cli",
+  "version": "0.1.0",
+  "description": "CLI for WSTF Chain - run nodes, manage services, and interact with the blockchain",
+  "main": "./dist/cli.js",
+  "bin": {
+    "wstf": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "build:watch": "node build.mjs --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "prepack": "npm run build",
+    "publish:dry": "npm publish --dry-run",
+    "publish:npm": "npm publish --access public"
+  },
+  "keywords": [
+    "wstf",
+    "wstfchain",
+    "blockchain",
+    "cli",
+    "node",
+    "validator",
+    "cryptocurrency"
+  ],
+  "author": "Wasserstoff Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wasserstoff-india/wstf.git",
+    "directory": "src/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/wasserstoff-india/wstf/issues"
+  },
+  "homepage": "https://github.com/wasserstoff-india/wstf#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bs58check": "^4.0.0",
+    "cbor": "^10.0.11",
+    "fastify": "^5.6.2"
+  }
+}

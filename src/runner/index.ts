@@ -2,6 +2,10 @@
  * Runner Module - Service orchestration and profiles
  */
 
+// Version info
+export { VERSION, BUILD_INFO, getVersionString, getVersionInfo } from './version';
+
+// Profiles
 export {
   ProfileName,
   Profile,
@@ -18,6 +22,7 @@ export {
   printProfileInfo,
 } from './profiles';
 
+// Unified runner
 export {
   RunnerContext,
   startRunner,

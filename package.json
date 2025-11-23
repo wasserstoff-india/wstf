@@ -3,12 +3,21 @@
   "version": "0.1.0",
   "description": "WSTFChain - A minimal blockchain implementation with multi-algorithm support",
   "main": "dist/index.js",
+  "bin": {
+    "wstf": "./dist/runner/cli.js"
+  },
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node",
-    "start": "node dist/runner/run.js",
-    "start:m3": "ts-node src/runner/run-m3.ts",
-    "start:unified": "ts-node src/runner/unified.ts",
+    "wstf": "ts-node src/runner/cli.ts",
+    "wstf:help": "ts-node src/runner/cli.ts help",
+    "wstf:version": "ts-node src/runner/cli.ts version",
+    "wstf:profiles": "ts-node src/runner/cli.ts profiles",
+    "start": "ts-node src/runner/cli.ts start",
+    "start:dev": "ts-node src/runner/cli.ts start --profile=dev",
+    "start:testnet": "ts-node src/runner/cli.ts start --profile=testnet",
+    "start:mainnet": "ts-node src/runner/cli.ts start --profile=mainnet",
+    "start:minimal": "ts-node src/runner/cli.ts start --profile=minimal",
+    "start:full": "ts-node src/runner/cli.ts start --profile=full",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
@@ -46,7 +55,10 @@
     "sdk:test": "vitest run src/sdk/sdk.test.ts",
     "sdk:test:all": "vitest run src/sdk/",
     "sdk:publish:dry": "cd src/sdk && npm publish --dry-run",
-    "sdk:publish": "cd src/sdk && npm publish --access public"
+    "sdk:publish": "cd src/sdk && npm publish --access public",
+    "cli:build": "cd src/cli && node build.mjs",
+    "cli:publish:dry": "cd src/cli && npm publish --dry-run",
+    "cli:publish": "cd src/cli && npm publish --access public"
   },
   "keywords": [
     "blockchain",
