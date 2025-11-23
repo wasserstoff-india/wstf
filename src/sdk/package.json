@@ -28,11 +28,17 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "build": "node build.mjs",
+    "build:types": "tsc --emitDeclarationOnly --declaration --declarationMap --outDir dist",
+    "build:watch": "node build.mjs --watch",
+    "test": "cd ../.. && npx vitest run src/sdk/sdk.test.ts",
+    "test:all": "cd ../.. && npx vitest run src/sdk/",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "prepublishOnly": "npm run clean && npm run build",
+    "prepack": "npm run build",
+    "publish:dry": "npm publish --dry-run",
+    "publish:npm": "npm publish --access public"
   },
   "keywords": [
     "wstf",
@@ -50,13 +56,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wasserstoff/wstf.git",
+    "url": "git+https://github.com/wasserstoff-india/wstf.git",
     "directory": "src/sdk"
   },
   "bugs": {
-    "url": "https://github.com/wasserstoff/wstf/issues"
+    "url": "https://github.com/wasserstoff-india/wstf/issues"
   },
-  "homepage": "https://github.com/wasserstoff/wstf#readme",
+  "homepage": "https://github.com/wasserstoff-india/wstf#readme",
   "engines": {
     "node": ">=18.0.0"
   },
