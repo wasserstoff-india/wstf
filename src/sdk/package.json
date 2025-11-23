@@ -1,0 +1,74 @@
+{
+  "name": "@wasserstoff/wstf-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for WSTF Chain - deterministic, instruction-based multi-chain coordination",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./highlevel": {
+      "types": "./dist/highlevel/index.d.ts",
+      "import": "./dist/highlevel/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
+  },
+  "keywords": [
+    "wstf",
+    "wstfchain",
+    "blockchain",
+    "sdk",
+    "typescript",
+    "defi",
+    "orderbook",
+    "markets",
+    "tokens",
+    "nft"
+  ],
+  "author": "WSTF Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wasserstoff/wstf.git",
+    "directory": "src/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/wasserstoff/wstf/issues"
+  },
+  "homepage": "https://github.com/wasserstoff/wstf#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "bs58check": "^3.0.1"
+  }
+}
