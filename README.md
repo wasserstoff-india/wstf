@@ -6,10 +6,10 @@
 [![Check](https://github.com/wasserstoff-india/wstf/actions/workflows/check.yml/badge.svg)](https://github.com/wasserstoff-india/wstf/actions/workflows/check.yml)
 
 <!-- Test Coverage -->
-![Tests](https://img.shields.io/badge/tests-1082%20passing-brightgreen?style=flat-square&logo=vitest)
-![Coverage](https://img.shields.io/badge/coverage-35%20test%20files-blue?style=flat-square)
-![Unit Tests](https://img.shields.io/badge/unit%20tests-850+-green?style=flat-square)
-![Chaos Tests](https://img.shields.io/badge/chaos%20tests-230+-orange?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-1215%20passing-brightgreen?style=flat-square&logo=vitest)
+![Coverage](https://img.shields.io/badge/coverage-42%20test%20files-blue?style=flat-square)
+![Unit Tests](https://img.shields.io/badge/unit%20tests-980+-green?style=flat-square)
+![Chaos Tests](https://img.shields.io/badge/chaos%20tests-325+-orange?style=flat-square)
 
 <!-- Security & Auth -->
 ![WSTFAuth](https://img.shields.io/badge/WSTFAuth-Enabled-success?style=flat-square&logo=shield)
@@ -48,7 +48,6 @@
 - [Test Results Summary](#test-results-summary)
 - [Services](#services)
 - [Wire Formats](#wire-formats)
-- [Milestones](#milestones)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 
@@ -93,6 +92,7 @@ WSTFChain is a **programmable instruction plane** for the multi-chain world:
 | **Gossip transactions** | P2P dedup + rate limiting; mempool policies by size/sender |
 | **Produce blocks** | Builder mines at configurable target; validator re-executes and checks roots |
 | **Fork choice** | Cumulative-work tip selection with reorg handling |
+| **On-chain orderbook** | Markets module with LP grids, escrow, OCC, bounded matching |
 
 ---
 
@@ -118,48 +118,58 @@ npm run start:m3             # + p2p + mempool
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          Applications                                │
-├─────────────────────────────────────────────────────────────────────┤
-│  Compiler API    │   Identity RPC   │   Explorer / Indexer          │
-├──────────────────┴──────────────────┴───────────────────────────────┤
-│                       Service Layer                                  │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
-│  │ Accounts │ │ Validator│ │ Mempool  │ │ Builder  │ │Connectors│  │
-│  │  :7001   │ │  :7002   │ │  :7004   │ │  :7005   │ │   SDK    │  │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
-├─────────────────────────────────────────────────────────────────────┤
-│                       Auth Layer (WSTFAuth)                          │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │  Token Format: <base64url(json)>.<signatureHex>                │ │
-│  │  Claims: sub, aud, iat, exp, jti, method, path, scope          │ │
-│  │  Algorithms: Ed25519, secp256k1                                │ │
-│  └────────────────────────────────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────────┤
-│                       Core Engine                                    │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │  Executor (deterministic)  │  Instruction Runner │  Event Logs │ │
-│  ├────────────────────────────┼─────────────────────┼─────────────┤ │
-│  │  SYS Module (9 opcodes)    │  PROG Module        │  Indexed    │ │
-│  └────────────────────────────┴─────────────────────┴─────────────┘ │
-├─────────────────────────────────────────────────────────────────────┤
-│                       Consensus Layer                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │ Block Types  │  │  PoW Mining  │  │ Fork Choice  │              │
-│  │ (184B header)│  │ (2xSHA256)   │  │ (cum. work)  │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-├─────────────────────────────────────────────────────────────────────┤
-│                       Network Layer                                  │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │  P2P Gossip (CBOR)  │  Rate Limiting  │  Peer Management       │ │
-│  └────────────────────────────────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────────┤
-│                       Storage Layer                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │ Chain Store  │  │ State Store  │  │ Account Store│              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Applications
+        A1[Compiler API]
+        A2[Identity RPC]
+        A3[Explorer / Indexer]
+    end
+
+    subgraph Services["Service Layer"]
+        S1[Accounts<br/>:7001]
+        S2[Validator<br/>:7002]
+        S3[Mempool<br/>:7004]
+        S4[Builder<br/>:7005]
+        S5[Connectors<br/>SDK]
+    end
+
+    subgraph Auth["Auth Layer - WSTFAuth"]
+        AU[Token: base64url.signature<br/>Claims: sub, aud, iat, exp, jti<br/>Algorithms: Ed25519, secp256k1]
+    end
+
+    subgraph Core["Core Engine"]
+        C1[Executor<br/>deterministic]
+        C2[Instruction Runner]
+        C3[Event Logs<br/>indexed]
+        C4[SYS Module<br/>9 opcodes]
+        C5[PROG Module]
+    end
+
+    subgraph Consensus["Consensus Layer"]
+        CO1[Block Types<br/>184B header]
+        CO2[PoW Mining<br/>2xSHA256]
+        CO3[Fork Choice<br/>cum. work]
+    end
+
+    subgraph Network["Network Layer"]
+        N1[P2P Gossip<br/>CBOR]
+        N2[Rate Limiting]
+        N3[Peer Management]
+    end
+
+    subgraph Storage["Storage Layer"]
+        ST1[Chain Store]
+        ST2[State Store]
+        ST3[Account Store]
+    end
+
+    Applications --> Services
+    Services --> Auth
+    Auth --> Core
+    Core --> Consensus
+    Consensus --> Network
+    Network --> Storage
 ```
 
 ### Directory Structure
@@ -194,6 +204,10 @@ src/
 ├── storage/             # KVStore abstraction, memory adapter
 ├── observability/       # Health endpoints, metrics
 ├── registry/            # INS module registry
+├── markets/             # On-chain orderbook module
+│   ├── types.ts         # Branded types, interfaces
+│   ├── store.ts         # InMemoryMarketStore
+│   └── exec.ts          # Execution helpers
 ├── explorer/            # Query service
 ├── config/              # Feature flags, configuration
 ├── runner/              # Service orchestration
@@ -212,30 +226,45 @@ test/
 
 ### 1. Transaction Flow
 
-```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  Client  │───>│ WSTFAuth │───>│ Mempool  │───>│ Builder  │───>│  Block   │
-│          │    │  Verify  │    │  Admit   │    │  Include │    │  Commit  │
-└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
-     │               │               │               │               │
-     │  Sign Token   │  Validate     │  Rate Limit   │  Execute      │  State
-     │  with Key     │  Signature    │  + Prioritize │  Instructions │  Update
-     └───────────────┴───────────────┴───────────────┴───────────────┘
+```mermaid
+flowchart LR
+    subgraph Client
+        A[Sign Token<br/>with Key]
+    end
+
+    subgraph WSTFAuth
+        B[Validate<br/>Signature]
+    end
+
+    subgraph Mempool
+        C[Rate Limit<br/>+ Prioritize]
+    end
+
+    subgraph Builder
+        D[Execute<br/>Instructions]
+    end
+
+    subgraph Block
+        E[State<br/>Update]
+    end
+
+    A -->|Submit| B
+    B -->|Admit| C
+    C -->|Include| D
+    D -->|Commit| E
 ```
 
 ### 2. Instruction Execution
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     Instruction Runner                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  1. Decode IR (ULEB128 + CBOR)                                      │
-│  2. Validate module/method exists                                   │
-│  3. Check caller permissions                                        │
-│  4. Execute with gas metering                                       │
-│  5. Collect effects (writes, events, logs)                          │
-│  6. Return deterministic result                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Runner["Instruction Runner"]
+        A[1. Decode IR<br/>ULEB128 + CBOR] --> B[2. Validate<br/>module/method exists]
+        B --> C[3. Check caller<br/>permissions]
+        C --> D[4. Execute with<br/>gas metering]
+        D --> E[5. Collect effects<br/>writes, events, logs]
+        E --> F[6. Return<br/>deterministic result]
+    end
 ```
 
 ### 3. Event Emission
@@ -400,6 +429,136 @@ const matches = hasTopicPrefix(log, topicFromString('my.program/v1'));
 
 ---
 
+## Markets Module
+
+The Markets module provides an on-chain orderbook system with LP liquidity grids, escrow management, and bounded matching operations.
+
+### Core Features
+
+| Feature | Description |
+|---------|-------------|
+| **Orderbook** | Price-time priority matching with bid/ask sides |
+| **LP Grids** | Automated liquidity placement (arithmetic or geometric spacing) |
+| **Escrow** | Per-user per-market token locking |
+| **OCC** | Optimistic Concurrency Control with version fields |
+| **Bounded Ops** | `MAX_LEVELS_PER_SIDE=64`, `MAX_MATCHES_PER_CALL=100` |
+
+### Branded Types
+
+```typescript
+import {
+  MarketId, OrderId, GridId, TradeId,
+  makeMarketId, makeOrderId, makeGridId, makeTradeId,
+  Side, MarketStatus, OrderStatus, SpreadMode,
+} from './markets/types';
+
+// Create market identifier
+const marketId = makeMarketId(baseTokenId, quoteTokenId);
+
+// Create order identifier (includes owner for uniqueness)
+const orderId = makeOrderId(marketId, ownerAddress, nonce);
+
+// Create grid identifier
+const gridId = makeGridId(marketId, ownerAddress, nonce);
+```
+
+### Market Operations
+
+```typescript
+import { InMemoryMarketStore } from './markets/store';
+
+const store = new InMemoryMarketStore();
+
+// Create a market
+await store.createMarket({
+  marketId,
+  baseTokenId: makeTokenId('BTC'),
+  quoteTokenId: makeTokenId('USDT'),
+  tickSize: 100n,           // $1 tick
+  lotSize: 100000n,         // 0.001 BTC
+  feeBps: 30,               // 0.3% fee
+  status: 'active',
+  creator: ownerAddress,
+  createdAtHeight: 1n,
+  version: 1n,
+});
+
+// Place an order
+await store.createOrder({
+  orderId,
+  marketId,
+  owner: traderAddress,
+  side: 'bid',              // 'bid' or 'ask'
+  price: 50000_00n,         // $50,000
+  size: 100000n,            // 0.001 BTC
+  remaining: 100000n,
+  status: 'open',
+  flags: [],                // 'post_only', 'ioc', 'fok'
+  createdAt: 1n,
+  version: 1n,
+});
+
+// Create LP grid
+await store.createGrid({
+  gridId,
+  marketId,
+  owner: mmAddress,
+  centerPrice: 50000_00n,
+  halfWidth: 5000_00n,      // ±$50 spread
+  levelsPerSide: 10,        // 10 bids + 10 asks
+  mode: 'arith',            // 'arith' or 'geom'
+  totalBaseSize: 1_000_000n,
+  sideBias: 'both',         // 'both', 'bid_only', 'ask_only'
+  status: 'active',
+  orderIds: [],
+  createdAt: 1n,
+  version: 1n,
+});
+```
+
+### Escrow Management
+
+```typescript
+// Lock tokens for trading
+await store.adjustEscrow(marketId, traderAddress, quoteTokenId, 10000_000000n);
+
+// Release tokens
+await store.adjustEscrow(marketId, traderAddress, quoteTokenId, -5000_000000n);
+
+// Check escrow balance
+const escrow = await store.getEscrow(marketId, traderAddress, quoteTokenId);
+console.log(escrow?.lockedAmount); // 5000_000000n
+```
+
+### Price Arithmetic
+
+```typescript
+import { calcQuoteAmount, calcFee, alignToTick } from './markets/types';
+
+// Quote amount = price × size
+const quote = calcQuoteAmount(50000_00n, 100000n); // 500_000_000_000n
+
+// Fee = (amount × feeBps) / 10000
+const fee = calcFee(quote, 30); // 0.3% fee
+
+// Align price to tick
+const aligned = alignToTick(50000_55n, 100n); // 50000_00n
+```
+
+### Test Coverage (133 tests)
+
+| Test File | Tests | Category |
+|-----------|-------|----------|
+| `markets/chaos.test.ts` | 45 | Error handling, edge cases |
+| `markets/invariants.test.ts` | 16 | Token conservation, level/trade invariants |
+| `markets/sequence.test.ts` | 12 | Commutativity, metamorphic scaling |
+| `markets/fuzz.test.ts` | 10 | Seeded RNG, random op sequences |
+| `markets/occ.test.ts` | 13 | OCC stress, double-spend prevention |
+| `integration/markets-authz.test.ts` | 16 | WSTFAuth + cross-module integration |
+| `bench/markets-eval.test.ts` | 21 | DoS safeguards, bounded operations |
+
+---
+
 ## System Opcodes
 
 The **SYS module** provides built-in opcodes:
@@ -428,10 +587,10 @@ The **SYS.PROG module** provides program registry opcodes:
 
 ## Testing
 
-**1082 tests passing** across 35 comprehensive test suites:
+**1215 tests passing** across 42 comprehensive test suites:
 
 ```bash
-# All tests (1082 passing)
+# All tests (1215 passing)
 npm run test:full
 
 # Unit tests by module
@@ -441,7 +600,8 @@ npx vitest run src/auth/              # WSTFAuth (76 tests)
 npx vitest run src/service/connector/ # Service connectors (84 tests)
 npx vitest run src/tokens/            # Token chaos tests (68 tests)
 npx vitest run src/vars/              # Variable store chaos (43 tests)
-npx vitest run src/bench/             # Benchmarks & evaluation (45 tests)
+npx vitest run src/markets/           # Markets module (96 tests)
+npx vitest run src/bench/             # Benchmarks & evaluation (66 tests)
 ```
 
 ---
@@ -467,6 +627,7 @@ WSTFChain ships with an opinionated evaluation suite that measures:
 | **Approvals** | Threshold, seq, tiered policies | `accounts/approvals.test.ts` | Sensitive actions require multi-signer flows | ✅ |
 | **Variables** | Namespaces, ACLs, OCC, chaos | `vars/chaos.test.ts` | No cross-namespace leak; no silent OCC overwrite | ✅ |
 | **Tokens** | FT/NFT/SFT, caps, auth, chaos | `tokens/chaos.test.ts` | No free mint, no supply break, no negative balance | ✅ |
+| **Markets** | Orderbook, grids, escrow, OCC | `markets/*.test.ts` | Token conservation, bounded matching, no double-spend | ✅ |
 | **Economics** | Gas metering, fees, rent, paymaster | `economics/*.test.ts`, `paymaster/*.test.ts` | No underpayment; sponsors can't bypass RBAC | ✅ |
 | **Events** | Event encoding, topics, retrieval | `events/logs/logs.test.ts` | Logs match executed effects across reorgs | ✅ |
 | **Benchmarks** | Latency p50/p95/p99, size projections | `bench/eval.test.ts` | P99/P50 ratio < 500; space projections sane | ✅ |
@@ -484,6 +645,11 @@ WSTFChain ships with an opinionated evaluation suite that measures:
 | Variable set (namespace) | p50 / p99 (µs) | 100-300 / 300-1000 | p99/p50 < 500 |
 | Variable get | ops/sec | 100K-500K | > 1,000 ops/sec |
 | Permission grant | ops/sec | 10K-50K | > 1,000 ops/sec |
+| Market order create | p50 / p99 (µs) | 50-200 / 200-1000 | p99/p50 < 500 |
+| Market order get | ops/sec | 100K-500K | > 1,000 ops/sec |
+| Escrow adjust | p50 / p99 (µs) | 50-150 / 150-500 | < 1ms average |
+| Trade record | ops/sec | 50K-200K | > 1,000 ops/sec |
+| Grid create (max levels) | p50 / p99 (µs) | 1K-5K / 5K-20K | < 50ms per grid |
 
 #### Space Projections
 
@@ -602,7 +768,14 @@ CAPACITY NOTES:
 | `micro.test.ts` | 13 | Bench | Microbenchmark sanity, latency bounds |
 | `space.test.ts` | 19 | Bench | Size estimation, bloat projections |
 | **bench/eval.test.ts** | **13** | **Bench** | **Regression tests, quick eval, full evaluation** |
-| **Total** | **1082** | | |
+| `markets/chaos.test.ts` | 45 | Chaos | Error handling, validation, edge cases |
+| `markets/invariants.test.ts` | 16 | Unit | Token conservation, level/trade invariants |
+| `markets/sequence.test.ts` | 12 | Unit | Commutativity, metamorphic scaling |
+| `markets/fuzz.test.ts` | 10 | Fuzz | Seeded RNG, random op sequences |
+| `markets/occ.test.ts` | 13 | Unit | OCC stress, double-spend prevention |
+| `integration/markets-authz.test.ts` | 16 | Integration | WSTFAuth + cross-module integration |
+| **bench/markets-eval.test.ts** | **21** | **Bench** | **DoS safeguards, bounded operations** |
+| **Total** | **1215** | | |
 
 ### Chaos Test Coverage
 
@@ -644,7 +817,16 @@ CAPACITY NOTES:
 | Namespace Creation | 5 | Duplicate namespace, ownership, org/app namespaces |
 | Type Handling | 4 | Type preservation, type change on overwrite, JSON handling |
 | **Subtotal** | **43** | Variable store chaos tests |
-| **Total Chaos Tests** | **192** | |
+| **Markets Chaos** | | |
+| Validation Edge Cases | 12 | tickSize, lotSize, feeBps, geometric ratio validation |
+| Type Mismatches | 8 | Wrong side, status transitions, branded type safety |
+| OCC/Version Conflicts | 13 | Stale version rejection, concurrent updates, double-spend |
+| Fuzz Testing | 10 | Seeded RNG, 100+ random op sequences, invariant preservation |
+| Invariants | 16 | Token conservation, level sorting, trade correctness |
+| DoS Safeguards | 21 | MAX_LEVELS, MAX_MATCHES, bounded operations |
+| Integration | 16 | WSTFAuth + markets, escrow isolation, determinism |
+| **Subtotal** | **96** | Markets module chaos/fuzz tests |
+| **Total Chaos Tests** | **288** | |
 
 ### Example Test Queries & Expected Results
 
@@ -718,40 +900,6 @@ d2e2f021415f613d8a9b7c...
 
 ---
 
-## Performance
-
-### Design Targets
-
-| Metric | Target | Notes |
-|--------|--------|-------|
-| Submit TPS | >= 1,000 | Mempool admission rate |
-| Validate TPS | >= 500 | Signature + ABI checks |
-| Commit TPS | >= 100 | Block inclusion (devnet) |
-| Submit -> Accept p95 | < 100ms | Node CPU bound |
-| Submit -> Committed p95 | ~2-4s | Constrained by block time |
-
----
-
-## Milestones
-
-| Phase | Milestone | Status | Description |
-|-------|-----------|--------|-------------|
-| **1** | M1: Core | Done | Crypto, addresses, tx v1, accounts, validation |
-| **1** | M2: Instructions | Done | Binary IR, executor, SYS opcodes, tx v2, INS registry |
-| **1** | M3: Network | Done | P2P gossip, mempool, rate limiting, service composition |
-| **1** | M4: Blocks | Done | PoW, chain store, fork choice, block builder/validator |
-| **1** | M5: Fast-Path | Done | Trust tiers, Hot Window, Pending Index, Preflight, SSE, Journal |
-| **1C** | Runner Profiles | Done | Dev/testnet/mainnet presets, unified runner |
-| **1C** | Observability | Done | Health/readyz/livez endpoints, metrics registry |
-| **1C** | Storage | Done | KVStore abstraction, memory + RocksDB adapters, snapshots |
-| **2** | Economics | Done | Tx v2F fees, gas metering, rent collector |
-| **2** | RPC Surface | Done | Simple + Enhanced RPC services, query indexes |
-| **2** | Paymaster | Done | Intrinsic sponsorship, vouchers, validation |
-| **2** | M6: Events | Done | Structured event logs, indexed topics, filtering |
-| **2** | M7: WSTFAuth | Done | Token auth, service connectors, chaos tests |
-
----
-
 ## Documentation
 
 | Document | Description |
@@ -797,13 +945,14 @@ See [src/common/errors.ts](src/common/errors.ts) for full catalog (30+ codes).
 ### Guidelines
 
 - All code must pass `npm run lint`
-- All 1082 tests must pass
+- All 1215 tests must pass
 - Golden vectors must not change without approval
 - New features require corresponding tests
 - Deterministic code only—no external I/O in executor
 - Security-critical paths require comprehensive chaos tests
-- Token/variable operations require chaos test coverage
+- Token/variable/market operations require chaos test coverage
 - Run `npm run bench:eval` before performance-related PRs
+- Markets module changes require invariant and OCC tests
 
 ---
 

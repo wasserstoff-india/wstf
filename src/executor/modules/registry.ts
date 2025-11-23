@@ -44,6 +44,7 @@ import {
   handleAPPROVAL_CANCEL,
   handleAPPROVAL_EXECUTE,
 } from './sys-approval';
+import { registerMarketModules } from './sys-market';
 
 /**
  * Register all built-in SYS modules
@@ -312,4 +313,7 @@ export function registerSystemModules(): void {
     selector: SYS_SELECTORS.APPROVAL_EXECUTE,
     handler: handleAPPROVAL_EXECUTE
   });
+
+  // Market/Orderbook modules
+  registerMarketModules();
 }

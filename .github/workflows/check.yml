@@ -123,18 +123,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run chaos tests (111 tests)
+      - name: Run chaos tests
         run: npm run test:chaos
 
       - name: Verify no crashes on malformed input
         run: |
           echo "## Chaos Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Category | Tests | Description |" >> $GITHUB_STEP_SUMMARY
-          echo "|----------|-------|-------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| WSTFAuth Chaos | 49 | Token tampering, encoding, fuzz |" >> $GITHUB_STEP_SUMMARY
-          echo "| Connector Chaos | 32 | Header chaos, auth flow |" >> $GITHUB_STEP_SUMMARY
-          echo "| Mood Game | 30 | End-to-end integration |" >> $GITHUB_STEP_SUMMARY
+          echo "| Category | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| WSTFAuth Chaos | Token tampering, encoding, fuzz |" >> $GITHUB_STEP_SUMMARY
+          echo "| Connector Chaos | Header chaos, auth flow |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mood Game | End-to-end integration |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tokens Chaos | Token operation edge cases |" >> $GITHUB_STEP_SUMMARY
+          echo "| Vars Chaos | Variable state mutations |" >> $GITHUB_STEP_SUMMARY
+          echo "| Markets Chaos | Orderbook stress testing |" >> $GITHUB_STEP_SUMMARY
 
   all-checks:
     name: All Checks Pass

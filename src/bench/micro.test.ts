@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest';
 import {
   runTokenBenchmarks,
   runVarBenchmarks,
+  runMarketBenchmarks,
   runAllMicroBenchmarks,
   formatMicroBenchReport,
   MicroBenchResult,
@@ -79,13 +80,44 @@ describe('Microbenchmarks', () => {
     });
   });
 
+  describe('Market Benchmarks', () => {
+    it('should run market benchmarks', async () => {
+      const suite = await runMarketBenchmarks(ITERATIONS);
+
+      expect(suite.name).toBe('Market Operations');
+      expect(suite.results.length).toBeGreaterThan(0);
+      expect(suite.totalDurationMs).toBeGreaterThan(0);
+
+      for (const result of suite.results) {
+        expect(result.operations).toBeGreaterThan(0);
+        expect(result.opsPerSecond).toBeGreaterThan(0);
+      }
+    });
+
+    it('should include expected market operations', async () => {
+      const suite = await runMarketBenchmarks(ITERATIONS);
+      const names = suite.results.map(r => r.name);
+
+      expect(names).toContain('market.create');
+      expect(names).toContain('market.order.create');
+      expect(names).toContain('market.order.get');
+      expect(names).toContain('market.level.set');
+      expect(names).toContain('market.level.list.100');
+      expect(names).toContain('market.escrow.adjust');
+      expect(names).toContain('market.trade.record');
+      expect(names).toContain('market.grid.create');
+      expect(names).toContain('market.topofbook.set');
+    });
+  });
+
   describe('Combined Suite', () => {
     it('should run all benchmarks', async () => {
       const suites = await runAllMicroBenchmarks(ITERATIONS);
 
-      expect(suites.length).toBe(2);
+      expect(suites.length).toBe(3);
       expect(suites[0].name).toBe('Token Operations');
       expect(suites[1].name).toBe('Variable Store Operations');
+      expect(suites[2].name).toBe('Market Operations');
     });
   });
 
@@ -97,6 +129,7 @@ describe('Microbenchmarks', () => {
       expect(report).toContain('MICROBENCHMARK RESULTS');
       expect(report).toContain('Token Operations');
       expect(report).toContain('Variable Store Operations');
+      expect(report).toContain('Market Operations');
       expect(report).toContain('Ops/sec');
       expect(report).toContain('P99');
     });

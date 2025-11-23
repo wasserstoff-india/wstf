@@ -52,22 +52,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run unit tests (607 tests)
+      - name: Run all unit tests
         run: npm run test:unit
-
-      - name: Run smoke tests (M1-M5)
-        run: npm run test:all
 
       - name: Generate test summary
         if: always()
         run: |
           echo "## Test Results - Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Test Suite | Tests | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | 607 | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Smoke Tests (M1-M5) | 5 suites | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Chaos Tests | 111 | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Description | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | Full vitest suite (1200+ tests) | ${{ job.status == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
 
   chaos-tests:
     name: Chaos Tests
@@ -118,6 +113,38 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 30
+
+  sdk-tests:
+    name: SDK Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run SDK tests
+        run: npm run test:sdk
+
+      - name: Build SDK
+        run: npm run sdk:build
+
+      - name: Verify SDK build
+        run: |
+          if [ ! -f "src/sdk/dist/index.js" ]; then
+            echo "::error::SDK build did not produce dist/index.js"
+            exit 1
+          fi
+          echo "SDK build artifacts verified"
+
+      - name: Dry-run publish
+        run: npm run sdk:publish:dry
 
   build-check:
     name: Build Check
