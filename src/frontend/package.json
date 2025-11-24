@@ -1,0 +1,102 @@
+{
+  "name": "@wasserstoff/wstf-kit",
+  "version": "0.1.0",
+  "description": "Frontend SDK and React components for WSTF Chain - wallet, explorer, and DeFi UI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./examples": {
+      "types": "./dist/examples/index.d.ts",
+      "import": "./dist/examples/index.js"
+    },
+    "./docs": {
+      "types": "./dist/docs/index.d.ts",
+      "import": "./dist/docs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "build:watch": "node build.mjs --watch",
+    "dev": "node dev.mjs",
+    "dev:docs": "node dev.mjs",
+    "clean": "rm -rf dist public",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build",
+    "prepack": "npm run build",
+    "publish:dry": "npm publish --dry-run",
+    "publish:npm": "npm publish --access public"
+  },
+  "keywords": [
+    "wstf",
+    "wstfchain",
+    "blockchain",
+    "react",
+    "frontend",
+    "sdk",
+    "wallet",
+    "explorer",
+    "defi",
+    "tailwind",
+    "web3"
+  ],
+  "author": "Wasserstoff Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wasserstoff-india/wstf.git",
+    "directory": "src/frontend"
+  },
+  "bugs": {
+    "url": "https://github.com/wasserstoff-india/wstf/issues"
+  },
+  "homepage": "https://github.com/wasserstoff-india/wstf#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/secp256k1": "^2.1.0",
+    "@noble/hashes": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  }
+}
