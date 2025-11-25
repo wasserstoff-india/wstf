@@ -1,7 +1,7 @@
 {
   "name": "wstfchain",
-  "version": "0.1.0",
-  "description": "WSTFChain - A minimal blockchain implementation with multi-algorithm support",
+  "version": "1.0.0",
+  "description": "WSTFChain - Production blockchain with cross-chain bridge coordination and access control",
   "main": "dist/index.js",
   "bin": {
     "wstf": "./dist/runner/cli.js"
@@ -71,6 +71,7 @@
   "dependencies": {
     "bs58check": "^4.0.0",
     "cbor": "^10.0.11",
+    "express": "^5.1.0",
     "fastify": "^5.6.2"
   },
   "devDependencies": {

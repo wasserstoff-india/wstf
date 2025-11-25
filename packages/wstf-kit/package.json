@@ -1,0 +1,89 @@
+{
+  "name": "@wasserstoff/wstf-kit",
+  "version": "1.0.0",
+  "description": "WSTFChain Frontend SDK - React hooks, components, and utilities for building dapps and wallets",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external react,react-dom",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --external react,react-dom --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "wstfchain",
+    "react",
+    "hooks",
+    "components",
+    "frontend",
+    "bridge",
+    "wallet",
+    "defi"
+  ],
+  "author": "Wasserstoff India",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wasserstoff-india/wstfchain.git",
+    "directory": "packages/wstf-kit"
+  },
+  "homepage": "https://github.com/wasserstoff-india/wstfchain#readme",
+  "bugs": {
+    "url": "https://github.com/wasserstoff-india/wstfchain/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@wstf/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.0.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

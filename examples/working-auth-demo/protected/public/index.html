@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Public Demo - Protected Content</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .success-banner {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px 5px 5px 0;
+            display: inline-block;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .feature {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-banner">
+        <h1>🎉 Authentication Successful!</h1>
+        <p>You have successfully accessed the protected public demo area.</p>
+    </div>
+
+    <div class="card">
+        <h2>🔐 Welcome to the Public Demo</h2>
+        <p>This page is protected by WSTFAuth and requires <strong>read-level</strong> access to the <code>public_demo</code> resource.</p>
+
+        <div class="feature">
+            <strong>🔑 Your Access Level:</strong> Read<br>
+            <strong>🏷️ Resource:</strong> public_demo<br>
+            <strong>⏰ Session:</strong> Active
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 What This Demonstrates</h2>
+        <ul>
+            <li><strong>Public Key Authentication:</strong> You proved ownership of an authorized public key</li>
+            <li><strong>Signature Challenge:</strong> Signed a unique challenge message</li>
+            <li><strong>Access Control:</strong> Only users with granted access can see this page</li>
+            <li><strong>Session Management:</strong> Your authentication session is now active</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>🛠️ Try These Features</h2>
+        <p>Test different aspects of the auth system:</p>
+
+        <a href="#" onclick="loadPublicData()" class="button">Load Public Data</a>
+        <a href="/premium-demo" class="button">Try Premium Demo</a>
+        <a href="/bridge-demo" class="button">Try Bridge Demo</a>
+
+        <div id="data-container" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔍 How It Works</h2>
+        <ol>
+            <li><strong>Resource Creation:</strong> The <code>public_demo</code> resource was created with specific access rules</li>
+            <li><strong>User Authorization:</strong> Your public key was granted <code>read</code> access to this resource</li>
+            <li><strong>Challenge Request:</strong> When you accessed this page, a unique challenge was generated</li>
+            <li><strong>Signature Verification:</strong> You signed the challenge to prove key ownership</li>
+            <li><strong>Token Issuance:</strong> A session token was issued with your permissions</li>
+            <li><strong>Protected Access:</strong> The token allows access to this protected content</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>🎯 Access Permissions</h2>
+        <div class="code">
+Resource: public_demo
+Level: read
+Scopes: ['demo_read']
+Can Read: ✅ Yes
+Can Write: ❌ No (need write level)
+Can Admin: ❌ No (need admin level)
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <p><a href="/">← Back to Main Demo</a></p>
+        <p style="color: #666;">🔐 Powered by WSTFAuth</p>
+    </div>
+
+    <script>
+        async function loadPublicData() {
+            const container = document.getElementById('data-container');
+            container.innerHTML = '<p>Loading public data...</p>';
+
+            try {
+                const response = await fetch('/api/public-data');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                container.innerHTML = `
+                    <div class="feature">
+                        <h4>📊 Public Data Loaded</h4>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>Your Public Key:</strong> ${data.user.publicKey}</p>
+                        <p><strong>Access Level:</strong> ${data.user.level}</p>
+                        <p><strong>Scopes:</strong> ${data.user.scopes.join(', ')}</p>
+
+                        <h5>Available Data:</h5>
+                        <ul>
+                            ${data.data.map(item => `<li><strong>${item.title}:</strong> ${item.description}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px;">
+                        <strong>❌ Error loading data:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-load data on page load
+        window.addEventListener('load', () => {
+            setTimeout(loadPublicData, 1000);
+        });
+    </script>
+</body>
+</html>

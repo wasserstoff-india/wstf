@@ -1,240 +1,90 @@
 /**
- * WSTF Chain SDK
+ * @wstf/sdk - WSTFChain Node/Backend SDK v1.0
  *
- * High-level SDK for interacting with the WSTF blockchain.
+ * Production-ready SDK for building bridge nodes, indexers, bots,
+ * and backend services that interact with WSTFChain.
  *
  * @example
  * ```typescript
- * import { WSTFSDK, SigAlg } from '@wasserstoff/wstf-sdk';
+ * import { WSTFSDK } from '@wstf/sdk';
  *
- * // Create SDK instance
- * const sdk = WSTFSDK.create({
- *   rpc: 'http://localhost:8545',
- *   signer: WSTFSDK.generateSigner(SigAlg.ED25519),
+ * // Connect to testnet
+ * const sdk = WSTFSDK.createForNetwork('testnet', signer);
+ *
+ * // Bridge operations
+ * const routes = await sdk.bridge.listRoutes({
+ *   srcChain: 'bsc',
+ *   dstChain: 'polygon',
+ *   token: 'USDT'
  * });
  *
- * // Use tokens API
- * const balance = await sdk.tokens.getBalance('tok_btc', sdk.address);
- *
- * // Use markets API
- * const order = await sdk.markets.placeOrder({
- *   marketId: 'mkt_btc_usdt',
- *   side: Side.BID,
- *   price: 50000_00n,
- *   size: 100000n,
+ * const order = await sdk.bridge.openOrder({
+ *   routeId: routes[0].routeId,
+ *   userAddress: sdk.address,
+ *   srcAmount: 1000n * 1_000_000n,
+ *   dstAddress: '0x742d35...'
  * });
  *
- * // Use vars API
- * await sdk.vars.setMyJson('settings', { theme: 'dark' });
+ * // Network discovery
+ * const clusterInfo = await sdk.network.getClusterInfo();
+ * const nodes = await sdk.nodes.listKnownNodes('bridge');
  * ```
  */
 
-// Re-export all core types and utilities
+// ============================================================================
+// STABLE SDK 1.0 EXPORTS
+// ============================================================================
+
+// Main SDK class (Enhanced production version)
+export { WSTFSDK, default as WSTFSDKDefault } from './sdk';
+
+// Core SDK configuration and types
+export type { SdkConfig, NetworkName, NetworkProfile, ClusterInfo, ChainId } from './types';
+
+// Network module for cluster information and service discovery
+export type { NetworkModule } from './network/types';
+export { createNetworkModule } from './network';
+export { DEFAULT_NETWORKS, getNetworkProfile } from './network/config';
+
+// Nodes module for node discovery and monitoring
+export type {
+  NodesModule,
+  NodeInfo,
+  NodeRole,
+  NodeHealth,
+  NodeSelectionCriteria
+} from './nodes/types';
+export { createNodesModule } from './nodes';
+
+// Bridge module for cross-chain operations
+export type {
+  BridgeModule,
+  BridgeProvider,
+  BridgeRoute,
+  BridgeOrder,
+  BridgeOrderStatus,
+  BridgeRouteQuery,
+  BridgeQuote,
+  BridgeStats,
+  RouteSelectionPriority
+} from './bridge/types';
+export { createEnhancedBridgeModule } from './bridge/enhanced-bridge';
+
+// Access control module
+export type { AccessPermission, AccessGuardStatus } from '../frontend-sdk/types';
+
+// Re-export existing stable modules
 export * from './core';
+export * from './bridge/bridge-sdk';
+export * from './auth/auth-sdk';
 
-// Re-export high-level helpers
-export * from './highlevel';
-
-// Import for SDK class
-import {
-  RpcClient,
-  createClient,
-  createTestClient,
-  ClientConfig,
-  Signer,
-  KeypairSigner,
+// Utility exports for SDK users
+export {
   createSigner,
   importSigner,
-  TokensSDK,
-  createTokensSDK,
-  MarketsSDK,
-  createMarketsSDK,
-  VarsSDK,
-  createVarsSDK,
-  SigAlg,
-  Address,
-  SdkError,
+  createClient,
+  type Signer,
+  type KeypairSigner,
+  type RpcClient,
+  SigAlg
 } from './core';
-
-/**
- * Extract error message from SdkResult error field.
- */
-function getErrorMessage(error: string | SdkError | undefined): string {
-  if (typeof error === 'string') return error;
-  if (error && typeof error === 'object') return error.message;
-  return 'Unknown error';
-}
-
-import type { SimpleRPCService } from '../rpc/types';
-
-// ============================================================================
-// SDK Configuration
-// ============================================================================
-
-/**
- * SDK configuration options.
- */
-export interface WSTFSDKConfig {
-  /** RPC endpoint URL or in-memory service for testing */
-  rpc: string | SimpleRPCService;
-  /** Signer for transactions */
-  signer: Signer;
-  /** Program IDs (optional, uses defaults) */
-  programs?: {
-    tokens?: string;
-    markets?: string;
-    vars?: string;
-  };
-  /** Client configuration overrides */
-  clientConfig?: Partial<ClientConfig>;
-}
-
-// ============================================================================
-// Main SDK Class
-// ============================================================================
-
-/**
- * WSTF Chain SDK - Main entry point.
- *
- * Provides unified access to all chain functionality:
- * - `tokens` - Token operations (FT, NFT, SFT)
- * - `markets` - Orderbook operations
- * - `vars` - Key/value storage
- * - `client` - Raw RPC access
- */
-export class WSTFSDK {
-  /** RPC client for chain queries */
-  readonly client: RpcClient;
-
-  /** Signer for transactions */
-  readonly signer: Signer;
-
-  /** Tokens SDK */
-  readonly tokens: TokensSDK;
-
-  /** Markets SDK */
-  readonly markets: MarketsSDK;
-
-  /** Vars SDK */
-  readonly vars: VarsSDK;
-
-  private constructor(config: WSTFSDKConfig) {
-    // Create RPC client
-    this.client = typeof config.rpc === 'string'
-      ? createClient({ rpc: config.rpc, ...config.clientConfig })
-      : createTestClient(config.rpc);
-
-    this.signer = config.signer;
-
-    // Create module SDKs
-    this.tokens = createTokensSDK(
-      this.client,
-      this.signer,
-      config.programs?.tokens
-    );
-
-    this.markets = createMarketsSDK(
-      this.client,
-      this.signer,
-      config.programs?.markets
-    );
-
-    this.vars = createVarsSDK(
-      this.client,
-      this.signer,
-      config.programs?.vars
-    );
-  }
-
-  /**
-   * Create a new SDK instance.
-   */
-  static create(config: WSTFSDKConfig): WSTFSDK {
-    return new WSTFSDK(config);
-  }
-
-  /**
-   * Create an SDK instance for testing with in-memory RPC.
-   */
-  static createForTesting(rpc: SimpleRPCService, signer?: Signer): WSTFSDK {
-    return new WSTFSDK({
-      rpc,
-      signer: signer ?? createSigner(SigAlg.ED25519),
-    });
-  }
-
-  /**
-   * Generate a new random signer.
-   */
-  static generateSigner(sigAlg: SigAlg = SigAlg.ED25519): Signer {
-    return createSigner(sigAlg);
-  }
-
-  /**
-   * Import a signer from a private key.
-   */
-  static importSigner(privateKey: string | Uint8Array, sigAlg: SigAlg): Signer {
-    return importSigner(privateKey, sigAlg);
-  }
-
-  /**
-   * Get the signer's address.
-   */
-  get address(): Address {
-    return this.signer.address;
-  }
-
-  /**
-   * Create a WSTFAuth token for a program.
-   */
-  createAuthToken(programId: string, ttlSeconds?: number): string {
-    return this.signer.createAuthToken(programId, { ttlSeconds });
-  }
-
-  /**
-   * Create a scoped WSTFAuth token.
-   */
-  createScopedToken(
-    programId: string,
-    scopes: string[],
-    ttlSeconds?: number
-  ): string {
-    return this.signer.createScopedToken(programId, scopes, { ttlSeconds });
-  }
-
-  /**
-   * Get current chain height.
-   */
-  async getHeight(): Promise<bigint> {
-    const result = await this.client.getHeight();
-    if (!result.success || result.data === undefined) {
-      throw new Error(getErrorMessage(result.error) || 'Failed to get chain height');
-    }
-    return result.data;
-  }
-
-  /**
-   * Get native token balance.
-   */
-  async getNativeBalance(address?: Address): Promise<bigint> {
-    const result = await this.client.getNativeBalance(address ?? this.address);
-    if (!result.success || result.data === undefined) {
-      throw new Error(getErrorMessage(result.error) || 'Failed to get balance');
-    }
-    return result.data;
-  }
-
-  /**
-   * Get account nonce.
-   */
-  async getNonce(address?: Address): Promise<bigint> {
-    const result = await this.client.getNonce(address ?? this.address);
-    if (!result.success || result.data === undefined) {
-      throw new Error(getErrorMessage(result.error) || 'Failed to get nonce');
-    }
-    return result.data;
-  }
-}
-
-// Default export
-export default WSTFSDK;

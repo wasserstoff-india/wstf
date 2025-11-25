@@ -1,53 +1,138 @@
-# WSTF Chain
+# WSTFChain v1.0 🚀
+
+<!-- Version & Release -->
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
+![SDK](https://img.shields.io/badge/SDK-Production%20Ready-success?style=flat-square)
+![Frontend Kit](https://img.shields.io/badge/Frontend%20Kit-1.0.0-green?style=flat-square)
 
 <!-- CI & Build Status -->
 [![CI](https://github.com/wasserstoff-india/wstf/actions/workflows/ci.yml/badge.svg)](https://github.com/wasserstoff-india/wstf/actions/workflows/ci.yml)
 [![Benchmark](https://github.com/wasserstoff-india/wstf/actions/workflows/benchmark.yml/badge.svg)](https://github.com/wasserstoff-india/wstf/actions/workflows/benchmark.yml)
 [![Check](https://github.com/wasserstoff-india/wstf/actions/workflows/check.yml/badge.svg)](https://github.com/wasserstoff-india/wstf/actions/workflows/check.yml)
 
-<!-- Test Coverage -->
-![Tests](https://img.shields.io/badge/tests-1215%20passing-brightgreen?style=flat-square&logo=vitest)
-![Coverage](https://img.shields.io/badge/coverage-42%20test%20files-blue?style=flat-square)
-![Unit Tests](https://img.shields.io/badge/unit%20tests-980+-green?style=flat-square)
-![Chaos Tests](https://img.shields.io/badge/chaos%20tests-325+-orange?style=flat-square)
+<!-- Bridge & Cross-Chain -->
+![Bridge System](https://img.shields.io/badge/Bridge-Production%20Ready-success?style=flat-square&logo=bridge)
+![Route Optimization](https://img.shields.io/badge/Route%20Optimization-Enabled-green?style=flat-square)
+![Trust Scoring](https://img.shields.io/badge/Trust%20Scoring-Active-blue?style=flat-square)
 
 <!-- Security & Auth -->
 ![WSTFAuth](https://img.shields.io/badge/WSTFAuth-Enabled-success?style=flat-square&logo=shield)
-![DDoS Protection](https://img.shields.io/badge/DDoS-Protected-success?style=flat-square&logo=cloudflare)
-![Rate Limiting](https://img.shields.io/badge/Rate%20Limiting-Enabled-success?style=flat-square)
+![Access Control](https://img.shields.io/badge/Access%20Control-Gated%20UIs-success?style=flat-square)
 ![Chaos Tested](https://img.shields.io/badge/Chaos-Tested-blueviolet?style=flat-square)
 
 <!-- Architecture -->
 ![Deterministic](https://img.shields.io/badge/Execution-Deterministic-blueviolet?style=flat-square)
-![Event Sourced](https://img.shields.io/badge/Events-Structured%20Logs-blue?style=flat-square)
-![Service Connectors](https://img.shields.io/badge/Connectors-SDK%20Ready-green?style=flat-square)
+![Event Driven](https://img.shields.io/badge/Events-Driven-blue?style=flat-square)
+![Multi Chain](https://img.shields.io/badge/Multi--Chain-Coordination-orange?style=flat-square)
 
 <!-- Tech Stack -->
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
-![Node.js](https://img.shields.io/badge/Node.js-20+-green?style=flat-square&logo=node.js)
+![React](https://img.shields.io/badge/React-18%2B-61DAFB?style=flat-square&logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=flat-square&logo=node.js)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
-> **A deterministic, modular wallet-chain with native authentication, structured events, and service connector SDK. Sign anywhere, verify anywhere, orchestrate multi-chain actions.**
+> **Production blockchain for cross-chain bridge coordination and access control. The "brain" for multi-chain operations with deterministic instruction processing, competitive bridge marketplace, and gated frontend framework.**
+
+---
+
+## 🚀 Quickstart (Local Devnet)
+
+```bash
+# Clone and setup
+git clone https://github.com/wasserstoff-india/wstfchain.git
+cd wstfchain
+
+# One-command setup (installs Node.js if needed)
+./scripts/wstfctl.sh setup
+
+# Run interactive setup
+./scripts/wstfctl.sh run --interactive
+```
+
+**What you get:**
+- ✅ **Working bridge system** with route optimization and trust scoring
+- ✅ **Access-controlled demos** running on `http://localhost:3000`
+- ✅ **Production-ready SDKs** for backend and frontend integration
+- ✅ **Complete test flows** demonstrating the bridge system
+
+## 📦 SDK & Frontend Integration
+
+### Backend/Node SDK (`@wstf/sdk`)
+```bash
+npm install @wstf/sdk
+```
+
+```typescript
+import { WSTFSDK } from '@wstf/sdk';
+
+// Connect to testnet
+const sdk = WSTFSDK.createForNetwork('testnet', signer);
+
+// Discover bridge routes
+const routes = await sdk.bridge.listRoutes({
+  srcChain: 'bsc',
+  dstChain: 'polygon',
+  token: 'USDT'
+});
+
+// Create bridge order
+const order = await sdk.bridge.openOrder({
+  routeId: routes[0].routeId,
+  userAddress: sdk.address,
+  srcAmount: 1000n * 1_000_000n,
+  dstAddress: '0x742d35...'
+});
+```
+
+### Frontend/React Kit (`@wasserstoff/wstf-kit`)
+```bash
+npm install @wasserstoff/wstf-kit
+```
+
+```tsx
+import {
+  WstfProvider,
+  BridgeForm,
+  ProtectedPage,
+  NetworkSwitcher
+} from '@wasserstoff/wstf-kit';
+
+function App() {
+  return (
+    <WstfProvider network="testnet" autoConnect={true}>
+      <div className="min-h-screen">
+        <header className="flex justify-between p-4">
+          <h1>My Bridge App</h1>
+          <NetworkSwitcher showLabel={true} />
+        </header>
+
+        <BridgeForm
+          supportedChains={['bsc', 'polygon', 'eth']}
+          onBridgeSubmit={handleBridge}
+        />
+
+        <ProtectedPage orgId="my.app" permission="premium">
+          <PremiumFeatures />
+        </ProtectedPage>
+      </div>
+    </WstfProvider>
+  );
+}
+```
 
 ---
 
 ## Table of Contents
 
-- [The Problem](#the-problem)
-- [The Solution](#the-solution)
-- [What It Can Do Today](#what-it-can-do-today)
-- [Quick Start](#quick-start)
+- [Quickstart](#quickstart-local-devnet)
+- [SDK & Frontend Integration](#sdk--frontend-integration)
+- [What WSTFChain Does](#what-wstfchain-does)
+- [Bridge System](#bridge-system)
+- [Access Control](#access-control)
 - [Architecture](#architecture)
-- [How It Works](#how-it-works)
-- [WSTFAuth System](#wstfauth-system)
-- [Service Connector SDK](#service-connector-sdk)
-- [Event System](#event-system)
-- [System Opcodes](#system-opcodes)
-- [Testing](#testing)
-- [Evaluation Matrix](#evaluation-matrix)
-- [Test Results Summary](#test-results-summary)
-- [Services](#services)
-- [Wire Formats](#wire-formats)
+- [Testing & Verification](#testing--verification)
+- [Network Profiles](#network-profiles)
+- [Development](#development)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 
@@ -219,6 +304,149 @@ test/
 ├── differential/        # 2-node determinism tests
 └── vectors/             # Golden test vectors
 ```
+
+---
+
+## Wallet Architecture & Security
+
+### 🔒 Security-First Design
+
+WSTFChain implements a **zero-trust wallet architecture** where:
+- **Client-side key generation only** - No private keys ever touch the server
+- **Validator agnostic** - Validates any properly signed transaction regardless of key origin
+- **Account abstraction ready** - Session keys, paymasters, and delegation support
+- **Multi-signature algorithms** - Ed25519, secp256k1, and future WebAuthn/P-256 support
+
+### Wallet Types & Usage Patterns
+
+| Wallet Type | Key Location | Security Model | Use Case |
+|-------------|-------------|----------------|----------|
+| **Paper Wallet** | Offline/Cold storage | Maximum security | Long-term storage, inheritance |
+| **Client SDK** | Browser/App memory | User-controlled | DApp interactions, trading |
+| **Session Keys** | Limited delegation | Time & scope bounded | Account abstraction, automation |
+| **Paymaster Keys** | Server-held delegation | Policy-restricted | Gas sponsorship, high-frequency ops |
+
+### Account Registration Flow
+
+```mermaid
+flowchart TB
+    subgraph "Client Side (Secure)"
+        A1[Generate Keypair<br/>Ed25519/secp256k1]
+        A2[Derive Address<br/>from Public Key]
+        A3[Sign WSTFAuth Token<br/>for Registration]
+    end
+
+    subgraph "Network"
+        N1[POST /accounts/register<br/>{ publicKey, address, sigAlg }]
+    end
+
+    subgraph "Accounts Service"
+        S1[Verify pubkey matches address]
+        S2[Store account metadata<br/>NO private key]
+        S3[Return registration confirmation]
+    end
+
+    subgraph "Validator"
+        V1[Accept transactions from<br/>ANY valid address]
+        V2[Verify signatures against<br/>registered OR embedded pubkey]
+    end
+
+    A1 --> A2 --> A3 --> N1
+    N1 --> S1 --> S2 --> S3
+    V1 --> V2
+```
+
+### Enhanced Paper Wallet Generation
+
+The SDK provides **military-grade entropy** for paper wallet generation:
+
+```typescript
+import { generatePaperWallet } from '@wstf/sdk';
+
+// Enhanced entropy with multiplication method
+const wallet = generatePaperWallet({
+  sigAlg: 'ed25519',
+  useEnhancedEntropy: true,
+  useMultiplicationMethod: true  // Multiplies 2 random numbers
+});
+
+console.log(wallet.entropy);
+// {
+//   sources: ['os-random', 'high-res-timer', 'process-entropy', 'multiplication-method'],
+//   totalBits: 512,
+//   method: 'enhanced-multiplication'
+// }
+```
+
+**Entropy Sources:**
+- **OS Random** - Primary cryptographic randomness from operating system
+- **High-res Timer** - Microsecond-precision timing variations
+- **Process Entropy** - Process-specific memory and state variations
+- **Multiplication Method** - Two large randoms multiplied for complex patterns
+
+### Account Abstraction & Session Management
+
+```mermaid
+flowchart TB
+    subgraph "User Authentication"
+        U1[Passkey/WebAuthn Registration]
+        U2[Create Session Delegation]
+        U3[Sign Permission Grant]
+    end
+
+    subgraph "Session Management"
+        S1[Store session in KV cache]
+        S2[Generate derived signing key]
+        S3[Set time & scope limits]
+    end
+
+    subgraph "Paymaster Operations"
+        P1[Validate session permissions]
+        P2[Build & sign transactions]
+        P3[Submit to validator]
+    end
+
+    subgraph "Security Boundaries"
+        B1[🔒 Master key never leaves user device]
+        B2[⏱️ Sessions auto-expire]
+        B3[🎯 Scope-limited permissions]
+        B4[🗑️ Revocable delegations]
+    end
+
+    U1 --> U2 --> U3
+    U3 --> S1 --> S2 --> S3
+    S3 --> P1 --> P2 --> P3
+    B1 & B2 & B3 & B4
+```
+
+### Secure Account Registration
+
+**✅ Secure Pattern (Client-Side Only):**
+```typescript
+// 1. Client-side key generation
+const signer = createSigner('ed25519');
+
+// 2. Register public key only
+fetch('/accounts/register', {
+  method: 'POST',
+  body: JSON.stringify({
+    address: signer.address,
+    publicKeyBase64: Buffer.from(signer.getPublicKeyDER()).toString('base64'),
+    sigAlg: 'ed25519'
+  })
+});
+
+// 3. Server NEVER sees private key
+```
+
+### Security Guarantees
+
+| Property | Implementation | Status |
+|----------|----------------|---------|
+| **No server key generation** | All keys generated client-side | ✅ **ENFORCED** |
+| **Public key verification** | Address derivation validation | ✅ **ENFORCED** |
+| **Session-based delegation** | Time & scope limited capabilities | ✅ **AVAILABLE** |
+| **Audit trail** | All registrations logged | ✅ **ENABLED** |
 
 ---
 

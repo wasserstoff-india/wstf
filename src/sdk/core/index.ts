@@ -20,8 +20,17 @@ export {
   generateAuthTokenId,
   createSigner,
   importSigner,
+  generatePaperWallet,
+  generatePaperWalletBatch,
+  validatePaperWallet,
 } from './signer';
-export type { Signer, AuthTokenOptions, ParsedAuthToken } from './signer';
+export type {
+  Signer,
+  AuthTokenOptions,
+  ParsedAuthToken,
+  PaperWallet,
+  PaperWalletOptions,
+} from './signer';
 
 // Tokens
 export { TokensSDK, createTokensSDK } from './tokens';
