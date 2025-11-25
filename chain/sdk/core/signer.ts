@@ -16,20 +16,20 @@ import {
 } from './types';
 
 // Internal imports
-import { generateKeypair, exportPubDER, Keypair } from '../../crypto/keys';
-import { deriveAddress } from '../../crypto/address';
-import { signPreimage } from '../../crypto/sign';
-import { SigAlgId, MappingAlgId } from '../../crypto/algorithms';
+import { generateKeypair, exportPubDER, Keypair } from '../../../src/crypto/keys';
+import { deriveAddress } from '../../../src/crypto/address';
+import { signPreimage } from '../../../src/crypto/sign';
+import { SigAlgId, MappingAlgId } from '../../../src/crypto/algorithms';
 import {
   signToken as internalSignToken,
   parseToken,
   isTokenExpired,
   getRemainingTTL,
   generateTokenId,
-} from '../../auth/wstf';
+} from '../../../src/auth/wstf';
 import {
   signBoundToken as internalSignBoundToken,
-} from '../../auth/binding';
+} from '../../../src/auth/binding';
 
 // ============================================================================
 // Type Conversions

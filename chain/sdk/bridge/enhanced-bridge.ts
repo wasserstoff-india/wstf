@@ -18,9 +18,9 @@ import type {
   BridgeStats,
   RouteSelectionPriority,
 } from './types';
-import { generateRequestId } from '../../instructions/xchain/types';
-import { instructionBuilder } from '../../core/instruction-engine/decoder';
-import { XChainOpcode } from '../../instructions/xchain/opcodes';
+import { generateRequestId } from '../../../src/instructions/xchain/types';
+import { instructionBuilder } from '../../../src/core/instruction-engine/decoder';
+import { XChainOpcode } from '../../../src/instructions/xchain/opcodes';
 
 /**
  * Enhanced bridge module implementation

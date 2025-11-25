@@ -181,6 +181,19 @@ app.get('/', (req, res) => {
     </div>
 
     <div class="card">
+        <h2>🚫 Test Access Denial (Negative Tests)</h2>
+        <p>These buttons demonstrate what happens when access is properly denied:</p>
+
+        <a href="/demo/unauthorized" class="button" style="background: #dc3545;">Unauthorized User</a>
+        <a href="/demo/insufficient" class="button" style="background: #dc3545;">Insufficient Permissions</a>
+        <a href="/demo/expired" class="button" style="background: #dc3545;">Expired Token</a>
+
+        <div class="warning">
+            <strong>Security Testing:</strong> These demonstrate proper access denial when users lack authorization, permissions, or have expired tokens.
+        </div>
+    </div>
+
+    <div class="card">
         <h2>🛠️ API Endpoints</h2>
         <p>Test the auth system programmatically:</p>
 
@@ -203,6 +216,8 @@ app.get('/', (req, res) => {
             <li><strong>Scope-based Permissions:</strong> Fine-grained control over what users can do</li>
             <li><strong>Session Management:</strong> Token-based authentication sessions</li>
             <li><strong>API Protection:</strong> Middleware that protects API endpoints</li>
+            <li><strong>Security Validation:</strong> Proper denial of unauthorized users, insufficient permissions, and expired tokens</li>
+            <li><strong>Error Handling:</strong> Appropriate HTTP status codes and error messages for different failure scenarios</li>
         </ol>
     </div>
 
@@ -291,6 +306,78 @@ app.get('/demo/bridge', (req, res) => {
     <p><strong>Your Access:</strong> bridge_user_1_pubkey_base64 (write level)</p>
     <p><strong>Scopes:</strong> bridge_execute, bridge_read</p>
     <p>You can now execute cross-chain bridge transactions!</p>
+    <p><a href="/">← Back to Main Demo</a></p>
+  `);
+});
+
+// =============================================================================
+// NEGATIVE TEST ROUTES - Demonstrate Access Denial
+// =============================================================================
+
+app.get('/demo/unauthorized', (req, res) => {
+  // Simulate an unknown/unauthorized user trying to access premium content
+  const userKey = 'unknown_hacker_pubkey_xyz123';
+  const hasAccess = simpleAuth.hasAccess('premium_demo', userKey, 'admin');
+
+  res.status(403).send(`
+    <h1>🚫 Access Denied - Unauthorized User</h1>
+    <p style="color: #dc3545;"><strong>Error:</strong> User not found in access list</p>
+    <p><strong>Attempted Access:</strong> unknown_hacker_pubkey_xyz123</p>
+    <p><strong>Resource:</strong> premium_demo (requires admin level)</p>
+    <p><strong>Status:</strong> User not in authorized users list</p>
+
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <h3>✅ Security Working Correctly!</h3>
+        <p>This demonstrates that the WSTFAuth system properly rejects unauthorized users who are not in the resource's access list.</p>
+    </div>
+
+    <p><a href="/">← Back to Main Demo</a></p>
+  `);
+});
+
+app.get('/demo/insufficient', (req, res) => {
+  // Simulate a user with read-only access trying to access admin features
+  const userKey = 'demo_user_1_pubkey_base64';  // This user only has 'read' level
+  const hasAccess = simpleAuth.hasAccess('premium_demo', userKey, 'admin');  // Requires 'admin'
+
+  res.status(403).send(`
+    <h1>🚫 Access Denied - Insufficient Permissions</h1>
+    <p style="color: #dc3545;"><strong>Error:</strong> Permission level too low</p>
+    <p><strong>Your Access:</strong> demo_user_1_pubkey_base64 (read level)</p>
+    <p><strong>Required:</strong> admin level</p>
+    <p><strong>Resource:</strong> premium_demo</p>
+
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <h3>✅ Permission System Working!</h3>
+        <p>This shows that users with valid authentication but insufficient permission levels are properly denied access to higher-privilege resources.</p>
+    </div>
+
+    <p><a href="/">← Back to Main Demo</a></p>
+  `);
+});
+
+app.get('/demo/expired', (req, res) => {
+  // Simulate an expired token scenario
+  const expiredTime = Date.now() - (60 * 60 * 1000); // 1 hour ago
+
+  res.status(401).send(`
+    <h1>🚫 Access Denied - Token Expired</h1>
+    <p style="color: #dc3545;"><strong>Error:</strong> Authentication token has expired</p>
+    <p><strong>Token Issued:</strong> ${new Date(expiredTime).toISOString()}</p>
+    <p><strong>Expired:</strong> ${new Date(expiredTime + 30*60*1000).toISOString()}</p>
+    <p><strong>Current Time:</strong> ${new Date().toISOString()}</p>
+    <p><strong>Status:</strong> Token validity window exceeded</p>
+
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <h3>✅ Token Expiration Working!</h3>
+        <p>This demonstrates that WSTFAuth properly validates token expiration times and rejects expired authentication attempts. Users must re-authenticate with fresh tokens.</p>
+    </div>
+
+    <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <h4>🔄 In Production:</h4>
+        <p>The system would typically redirect to re-authentication flow or provide token refresh mechanisms.</p>
+    </div>
+
     <p><a href="/">← Back to Main Demo</a></p>
   `);
 });

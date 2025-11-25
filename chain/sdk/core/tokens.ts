@@ -28,7 +28,7 @@ import type {
   MintRequest,
   BurnRequest,
   ApprovalRequest,
-} from '../../tokens/types';
+} from '../../../src/tokens/types';
 
 // ============================================================================
 // Token Types for SDK

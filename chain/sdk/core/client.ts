@@ -39,7 +39,7 @@ import type {
   TransactionInfo,
   AccountInfo,
   GasEstimate,
-} from '../../rpc/types';
+} from '../../../src/rpc/types';
 
 // ============================================================================
 // Client Configuration

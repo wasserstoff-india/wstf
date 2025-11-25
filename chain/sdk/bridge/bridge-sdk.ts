@@ -16,13 +16,13 @@ import {
   generateRequestId,
   validateBridgeRequest,
   BRIDGE_CONFIG
-} from '../../instructions/xchain/types';
+} from '../../../src/instructions/xchain/types';
 import {
   compileBridgeRequest,
   compileBridgeRouteRegistration,
   XChainOpcode
-} from '../../instructions/xchain/opcodes';
-import { RouteSelectionCriteria, RouteDiscoveryResult } from '../../service/bridge-registry/registry';
+} from '../../../src/instructions/xchain/opcodes';
+import { RouteSelectionCriteria, RouteDiscoveryResult } from '../../../src/service/bridge-registry/registry';
 
 /**
  * Bridge SDK configuration

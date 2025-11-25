@@ -48,7 +48,7 @@ import type {
   CreateMarketParams,
   PlaceOrderParams,
   CreateGridParams,
-} from '../../markets/types';
+} from '../../../src/markets/types';
 
 // ============================================================================
 // Market SDK Types

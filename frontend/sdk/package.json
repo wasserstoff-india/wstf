@@ -1,7 +1,7 @@
 {
-  "name": "@wasserstoff/wstf-sdk",
-  "version": "0.1.0",
-  "description": "TypeScript SDK for WSTF Chain - deterministic, instruction-based multi-chain coordination",
+  "name": "@wasserstoff/wstf-kit",
+  "version": "1.0.0",
+  "description": "Frontend SDK and React components for WSTF Chain - wallet, explorer, and DeFi UI",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -15,9 +15,21 @@
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.js"
     },
-    "./highlevel": {
-      "types": "./dist/highlevel/index.d.ts",
-      "import": "./dist/highlevel/index.js"
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./examples": {
+      "types": "./dist/examples/index.d.ts",
+      "import": "./dist/examples/index.js"
+    },
+    "./docs": {
+      "types": "./dist/docs/index.d.ts",
+      "import": "./dist/docs/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -29,12 +41,11 @@
   ],
   "scripts": {
     "build": "node build.mjs",
-    "build:types": "tsc --emitDeclarationOnly --declaration --declarationMap --outDir dist",
     "build:watch": "node build.mjs --watch",
-    "test": "cd ../.. && npx vitest run src/sdk/sdk.test.ts",
-    "test:all": "cd ../.. && npx vitest run src/sdk/",
+    "dev": "node dev.mjs",
+    "dev:docs": "node dev.mjs",
+    "clean": "rm -rf dist public",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "prepack": "npm run build",
     "publish:dry": "npm publish --dry-run",
@@ -44,20 +55,21 @@
     "wstf",
     "wstfchain",
     "blockchain",
+    "react",
+    "frontend",
     "sdk",
-    "typescript",
+    "wallet",
+    "explorer",
     "defi",
-    "orderbook",
-    "markets",
-    "tokens",
-    "nft"
+    "tailwind",
+    "web3"
   ],
-  "author": "WSTF Team",
+  "author": "Wasserstoff Team",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wasserstoff-india/wstf.git",
-    "directory": "src/sdk"
+    "directory": "src/frontend"
   },
   "bugs": {
     "url": "https://github.com/wasserstoff-india/wstf/issues"
@@ -67,14 +79,24 @@
     "node": ">=18.0.0"
   },
   "peerDependencies": {
-    "typescript": ">=5.0.0"
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
-    "typescript": {
-      "optional": true
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
     }
   },
   "dependencies": {
-    "bs58check": "^3.0.1"
+    "@noble/ed25519": "^2.1.0",
+    "@noble/secp256k1": "^2.1.0",
+    "@noble/hashes": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
   }
 }

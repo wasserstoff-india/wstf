@@ -6,7 +6,7 @@
 
 import type { RpcClient, Signer } from './core';
 import { createClient } from './core/client';
-import { createSigner, importSigner, KeypairSigner, SigAlg } from './core/signer';
+import { createSigner, importSigner, KeypairSigner, SigAlg } from './core';
 import type {
   SdkConfig,
   NetworkName,

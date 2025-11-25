@@ -24,7 +24,7 @@ import type {
   VarPermissions,
   VarListFilters,
   VarQueryResult,
-} from '../../vars/types';
+} from '../../../src/vars/types';
 
 import {
   makeNamespace,
@@ -36,7 +36,7 @@ import {
   encodeValue,
   decodeValue,
   isValidKey,
-} from '../../vars/types';
+} from '../../../src/vars/types';
 
 // ============================================================================
 // SDK Types

@@ -6,7 +6,7 @@
  */
 
 import { KeypairSigner } from '../core/signer';
-import { WSTFAuthToken, AccessControlEntry, AccessControlList } from '../../auth/wstf-auth';
+import { WSTFAuthToken, AccessControlEntry, AccessControlList } from '../../../src/auth/wstf-auth';
 
 /**
  * Auth SDK configuration
