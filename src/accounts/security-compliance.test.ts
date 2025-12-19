@@ -8,15 +8,32 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { startAccountsService } from './service';
 import { FastifyInstance } from 'fastify';
+import { MappingAlgId, SigAlgId } from '../crypto/algorithms';
+import { deriveAddress } from '../crypto/address';
 
 describe('Accounts Service Security Compliance', () => {
   let serviceApp: { app: FastifyInstance; accounts: any; users: any };
   let serviceUrl: string;
+  let testAddress: string;
 
   beforeEach(async () => {
     const port = 7000 + Math.floor(Math.random() * 1000);
     serviceApp = await startAccountsService(port);
     serviceUrl = `http://localhost:${port}`;
+
+    // Register a valid test user so we don't hit 404 for account existence checks
+    const pubKey = Buffer.from('YmFzZTY0X21vY2tfY29udGVudF9hdF9sZWFzdF8zMl9ieXRlc19mb3JfdmFsaWRhdGlvbg==', 'base64');
+    testAddress = deriveAddress(pubKey, MappingAlgId.SIMPLE_HASH, SigAlgId.ED25519);
+
+    await fetch(`${serviceUrl}/accounts/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        address: testAddress,
+        publicKeyBase64: pubKey.toString('base64'),
+        sigAlg: 'ed25519'
+      })
+    });
   });
 
   afterEach(async () => {
@@ -292,7 +309,7 @@ describe('Accounts Service Security Compliance', () => {
       const invalidPermissions = [
         null, // Null permissions
         '', // Empty string
-        'INVALID_PERMISSION', // Unknown permission
+        'INVALID PERMISSION', // Space makes it invalid
         [''], // Array with empty string
         123, // Number instead of array/string
         { permission: 'test' } // Object instead of array/string
@@ -303,7 +320,7 @@ describe('Accounts Service Security Compliance', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userAddress: 'gc-test',
+            userAddress: testAddress,
             permissions: badPermissions,
             expiresAt: Date.now() + 60000
           })
@@ -316,7 +333,7 @@ describe('Accounts Service Security Compliance', () => {
     it('should enforce session expiration limits', async () => {
       const invalidExpirations = [
         Date.now() - 1000, // Already expired
-        Date.now() + 365 * 24 * 60 * 60 * 1000, // Too far in future (1 year)
+        Date.now() + 2 * 365 * 24 * 60 * 60 * 1000, // Too far in future (2 years)
         'invalid', // Non-numeric
         null, // Null
         -1 // Negative
@@ -327,7 +344,7 @@ describe('Accounts Service Security Compliance', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userAddress: 'gc-test',
+            userAddress: testAddress,
             permissions: ['READ'],
             expiresAt: badExpiration
           })

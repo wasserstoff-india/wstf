@@ -141,8 +141,8 @@ export class WSTFInstructionDecoder implements InstructionDecoder {
 
     try {
       instructionData = JSON.parse(dataStr);
-    } catch (error) {
-      throw new Error(`Invalid instruction data: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Invalid instruction data: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     offset += dataLength;
@@ -202,8 +202,8 @@ export class WSTFInstructionDecoder implements InstructionDecoder {
     // Try to serialize data
     try {
       JSON.stringify(instruction.data);
-    } catch (error) {
-      errors.push(`Data not serializable: ${error.message}`);
+    } catch (error: unknown) {
+      errors.push(`Data not serializable: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     return {
@@ -258,6 +258,18 @@ export class WSTFInstructionDecoder implements InstructionDecoder {
  */
 export class InstructionBuilder {
   private decoder = new WSTFInstructionDecoder();
+
+  /**
+   * Create generic instruction
+   */
+  createInstruction(
+    opcode: number,
+    data: any,
+    sender: string,
+    options: any = {}
+  ): Instruction {
+    return this.decoder.createInstruction(opcode, data, sender, options);
+  }
 
   /**
    * Create bridge route registration instruction

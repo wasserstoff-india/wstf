@@ -56,7 +56,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch providers: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.providers || [];
     } catch (error) {
       console.warn('Failed to fetch providers, returning empty list:', error);
@@ -77,7 +77,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch provider: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.provider || null;
     } catch (error) {
       console.warn(`Failed to fetch provider ${id}:`, error);
@@ -117,7 +117,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch routes: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.routes || [];
     } catch (error) {
       console.warn('Failed to fetch routes:', error);
@@ -138,7 +138,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch route: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.route || null;
     } catch (error) {
       console.warn(`Failed to fetch route ${routeId}:`, error);
@@ -162,7 +162,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to get quote: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const quote = data.quote;
 
       return {
@@ -200,7 +200,12 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
       }
 
       // Generate unique order ID
-      const orderId = generateRequestId();
+      const orderId = generateRequestId(
+        params.userAddress,
+        params.routeId,
+        0n,
+        BigInt(Date.now())
+      );
 
       // Create bridge request instruction
       const bridgeRequest = {
@@ -220,18 +225,11 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
       );
 
       // Submit to chain
-      const result = await this.client.submitTransaction({
-        instructions: [instruction],
-        signer: this.signer,
-      });
-
-      if (!result.success || !result.data) {
-        throw new Error(`Failed to submit bridge order: ${result.error}`);
-      }
+      const txId = await this.client.submitInstruction(instruction);
 
       return {
         orderId,
-        txId: result.data.txId,
+        txId,
       };
     } catch (error) {
       throw new Error(`Failed to open bridge order: ${error}`);
@@ -251,7 +249,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch order: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const order = data.order;
 
       return {
@@ -283,7 +281,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch user orders: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const orders = data.orders || [];
 
       return orders.map((order: any) => ({
@@ -315,16 +313,9 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
       );
 
       // Submit to chain
-      const result = await this.client.submitTransaction({
-        instructions: [instruction],
-        signer: this.signer,
-      });
+      const txId = await this.client.submitInstruction(instruction);
 
-      if (!result.success || !result.data) {
-        throw new Error(`Failed to cancel order: ${result.error}`);
-      }
-
-      return { txId: result.data.txId };
+      return { txId };
     } catch (error) {
       throw new Error(`Failed to cancel order: ${error}`);
     }
@@ -366,11 +357,11 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         case 'balanced':
           // Weighted score: 40% trust, 30% speed, 30% cost
           const scoreA = (a.trustScore / 1000) * 0.4 +
-                        (1 - a.estimatedTimeSec / 3600) * 0.3 +
-                        (1 - a.feeBps / 100) * 0.3;
+            (1 - a.estimatedTimeSec / 3600) * 0.3 +
+            (1 - a.feeBps / 100) * 0.3;
           const scoreB = (b.trustScore / 1000) * 0.4 +
-                        (1 - b.estimatedTimeSec / 3600) * 0.3 +
-                        (1 - b.feeBps / 100) * 0.3;
+            (1 - b.estimatedTimeSec / 3600) * 0.3 +
+            (1 - b.feeBps / 100) * 0.3;
           return scoreB - scoreA;
 
         default:
@@ -414,7 +405,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch bridge stats: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.stats;
     } catch (error) {
       console.warn('Failed to fetch bridge stats:', error);
@@ -451,7 +442,7 @@ class EnhancedBridgeModuleImpl implements BridgeModule {
         throw new Error(`Failed to fetch provider stats: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data;
     } catch (error) {
       throw new Error(`Failed to fetch provider stats: ${error}`);

@@ -197,8 +197,8 @@ export class WSTFSimulator {
 
       const averageConfirmationTime = this.bridgeContext.completedBridges.length > 0
         ? this.bridgeContext.completedBridges.reduce((sum, bridge) =>
-            sum + (bridge.completedAt ? Number(bridge.completedAt - bridge.startedAt!) : 0), 0
-          ) / this.bridgeContext.completedBridges.length
+          sum + (bridge.completedAt ? Number(bridge.completedAt - bridge.startedAt!) : 0), 0
+        ) / this.bridgeContext.completedBridges.length
         : 0;
 
       console.log('✅ Bridge scenario completed!\n');
@@ -362,8 +362,11 @@ export class WSTFSimulator {
     return {
       sender,
       blockHeight: this.currentHeight,
+      blockTime: BigInt(this.currentTime),
       timestamp: this.currentTime,
+      chainId: this.config.chainId,
       gasLimit: this.config.gasLimit,
+      gasUsed: 0n,
       chainConfig: { chainId: this.config.chainId }
     };
   }

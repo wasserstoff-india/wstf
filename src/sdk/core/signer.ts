@@ -177,12 +177,24 @@ export class KeypairSigner implements Signer {
           publicKeyObject = crypto.createPublicKey(privateKeyObject);
         }
       } else {
-        // SECP256K1 - assume DER format
-        privateKeyObject = crypto.createPrivateKey({
-          key: Buffer.from(privateKey),
-          format: 'der',
-          type: 'pkcs8',
-        });
+        // SECP256K1 - wrap raw 32-byte key in SEC1 DER if needed
+        if (privateKey.length === 32) {
+          privateKeyObject = crypto.createPrivateKey({
+            key: Buffer.concat([
+              Buffer.from('302e0201010420', 'hex'),
+              Buffer.from(privateKey),
+              Buffer.from('a00706052b8104000a', 'hex'),
+            ]),
+            format: 'der',
+            type: 'sec1',
+          });
+        } else {
+          privateKeyObject = crypto.createPrivateKey({
+            key: Buffer.from(privateKey),
+            format: 'der',
+            type: 'pkcs8',
+          });
+        }
         publicKeyObject = crypto.createPublicKey(privateKeyObject);
       }
     }
@@ -198,6 +210,10 @@ export class KeypairSigner implements Signer {
 
   get address(): Address {
     return this._address;
+  }
+
+  get publicKeyBase64(): string {
+    return Buffer.from(this.getPublicKeyDER()).toString('base64');
   }
 
   get sigAlg(): SigAlg {

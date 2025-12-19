@@ -5,6 +5,7 @@
  */
 
 import type { RpcClient, Signer } from './core';
+import type { SimpleRPCService } from '../rpc/types';
 import { createClient } from './core/client';
 import { createSigner, importSigner, KeypairSigner, SigAlg } from './core';
 import type {
@@ -126,8 +127,12 @@ export class WSTFSDK {
     // Create RPC client
     const client = createClient({
       rpc: networkProfile.rpcUrls.core,
-      timeout: config.timeoutMs || 30000,
-      retries: config.retry?.maxRetries || 3,
+      timeoutMs: config.timeoutMs || 30000,
+      retry: {
+        maxAttempts: config.retry?.maxRetries || 3,
+        baseDelayMs: 500,
+        maxDelayMs: 5000,
+      }
     });
 
     return new WSTFSDK(networkProfile, client, config.signer);
@@ -159,7 +164,7 @@ export class WSTFSDK {
 
     const client = createClient({
       rpc: networkProfile.rpcUrls.core,
-      timeout: options.timeoutMs || 30000,
+      timeoutMs: options.timeoutMs || 30000,
     });
 
     return new WSTFSDK(networkProfile, client, signer);
@@ -168,11 +173,23 @@ export class WSTFSDK {
   /**
    * Create SDK instance for testing with local network
    */
-  static createForTesting(signer?: Signer): WSTFSDK {
+  static createForTesting(signerOrRpc?: Signer | SimpleRPCService): WSTFSDK {
     const networkProfile = getNetworkProfile('local');
+    let signer: Signer | undefined;
+    let rpc: string | SimpleRPCService = networkProfile.rpcUrls.core;
+
+    if (signerOrRpc) {
+      // Simple heuristic to distinguish Signer from RPC service
+      if ('address' in signerOrRpc) {
+        signer = signerOrRpc as Signer;
+      } else {
+        rpc = signerOrRpc as SimpleRPCService;
+      }
+    }
+
     const client = createClient({
-      rpc: networkProfile.rpcUrls.core,
-      timeout: 10000,
+      rpc,
+      timeoutMs: 10000,
     });
 
     return new WSTFSDK(
@@ -224,7 +241,7 @@ export class WSTFSDK {
     // Create new client for the new network
     const newClient = createClient({
       rpc: newProfile.rpcUrls.core,
-      timeout: 30000,
+      timeoutMs: 30000,
     });
 
     return new WSTFSDK(newProfile, newClient, this.signer);
@@ -278,7 +295,7 @@ export class WSTFSDK {
       throw new Error('Address or signer required');
     }
 
-    const result = await this.client.getNativeBalance(addr);
+    const result = await this.client.getNativeBalance(addr as any);
     if (!result.success || result.data === undefined) {
       throw new Error(String(result.error) || 'Failed to get balance');
     }
@@ -294,7 +311,7 @@ export class WSTFSDK {
       throw new Error('Address or signer required');
     }
 
-    const result = await this.client.getNonce(addr);
+    const result = await this.client.getNonce(addr as any);
     if (!result.success || result.data === undefined) {
       throw new Error(String(result.error) || 'Failed to get nonce');
     }

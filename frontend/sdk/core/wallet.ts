@@ -12,7 +12,9 @@ import type {
   WalletExportMeta,
   WalletEventHandler,
   WalletEvent,
+  RelayTxPayload,
 } from './types';
+import { StandardMethodId } from './types';
 import { hasWebCrypto, hasPasskeySupport, hasIndexedDB } from './config';
 
 // ============================================================
@@ -256,8 +258,31 @@ class LocalKeypairSigner implements FrontendSigner {
 }
 
 // ============================================================
-// Wallet Storage
+// Multi-Curve Identity
 // ============================================================
+
+export class MultiCurveIdentity {
+  constructor(
+    public username: string,
+    public signers: Map<FrontendSigAlg, FrontendSigner> = new Map()
+  ) { }
+
+  addSigner(signer: FrontendSigner) {
+    this.signers.set(signer.sigAlg, signer);
+  }
+
+  async sign(data: Uint8Array, preferredAlg?: FrontendSigAlg): Promise<{ signature: Uint8Array; alg: FrontendSigAlg }> {
+    const keys = Array.from(this.signers.keys());
+    if (keys.length === 0) throw new Error('No signers available');
+
+    const alg = preferredAlg || (this.signers.has('passkey') ? 'passkey' : keys[0]);
+    const signer = this.signers.get(alg);
+    if (!signer) throw new Error(`No signer for algorithm: ${alg}`);
+
+    const signature = await signer.sign(data);
+    return { signature, alg };
+  }
+}
 
 interface EncryptedWalletData {
   id: string;
@@ -561,7 +586,7 @@ export class WalletManager {
           publicKey: {
             challenge: data,
             rpId: options.rpId,
-            allowCredentials: [{ id: hexToBytes(id), type: 'public-key' }],
+            allowCredentials: [{ id: credential.rawId, type: 'public-key' }],
             userVerification: 'required',
             timeout: 60000,
           },
@@ -572,6 +597,8 @@ export class WalletManager {
         }
 
         const assertionResponse = assertion.response as AuthenticatorAssertionResponse;
+        // The signature here is the full WebAuthn signature (DER encoded)
+        // In a real implementation, we might want to parse this or keep it as is
         return new Uint8Array(assertionResponse.signature);
       },
       exportMeta: async () => ({
@@ -597,6 +624,73 @@ export class WalletManager {
    */
   listWallets(): StoredWalletMeta[] {
     return this.storage.listWallets();
+  }
+
+  /**
+   * Assemble a Relay Transaction (Method-Target-Data)
+   * This is the core modular backend transaction format.
+   */
+  async assembleRelayTx(params: {
+    methodId: StandardMethodId | number;
+    to: string; // @username or address
+    data: any;  // JSON or string
+    signer?: FrontendSigner;
+  }): Promise<RelayTxPayload> {
+    const activeSigner = params.signer || this.current;
+    if (!activeSigner) throw new Error('No active signer');
+
+    const dataString = typeof params.data === 'string' ? params.data : JSON.stringify(params.data);
+
+    return {
+      methodId: params.methodId,
+      to: params.to,
+      data: dataString,
+    };
+  }
+
+  /**
+   * Helper to deploy a new token
+   */
+  async deployToken(params: {
+    to: string;
+    name: string;
+    symbol: string;
+    supply: bigint;
+    signer?: FrontendSigner;
+  }): Promise<RelayTxPayload> {
+    return this.assembleRelayTx({
+      methodId: StandardMethodId.TOK_DEPLOY,
+      to: params.to,
+      data: {
+        name: params.name,
+        symbol: params.symbol,
+        supply: params.supply.toString(),
+      },
+      signer: params.signer,
+    });
+  }
+
+  /**
+   * Helper to mint tokens
+   */
+  async mintToken(params: {
+    to: string;
+    tokenId: string;
+    amount: bigint;
+    recipient: string;
+    protected?: boolean;
+    signer?: FrontendSigner;
+  }): Promise<RelayTxPayload> {
+    return this.assembleRelayTx({
+      methodId: params.protected ? StandardMethodId.TOK_MINT_PROTECTED : StandardMethodId.TOK_MINT,
+      to: params.to,
+      data: {
+        tokenId: params.tokenId,
+        amount: params.amount.toString(),
+        recipient: params.recipient,
+      },
+      signer: params.signer,
+    });
   }
 
   /**

@@ -151,6 +151,43 @@ export interface TransactionInfo {
 }
 
 // ============================================================
+// Standardized Method & Relay Types
+// ============================================================
+
+export enum StandardMethodId {
+  // HTTP standardized methods
+  HTTP_GET = 0x00000070,
+  HTTP_POST = 0x00000071,
+  HTTP_PUT = 0x00000072,
+  HTTP_FETCH = 0x00000073,
+
+  // Asset standards (Existing)
+  TOK_DEPLOY = 0x00000030,
+  TOK_MINT = 0x00000031,
+  TOK_MINT_PROTECTED = 0x0000003b,
+  TOK_TRANSFER = 0x00000033,
+  NFT_TRANSFER = 0x00000040, // Creating or transferring
+
+  // EVM Gateway standards (0x80+)
+  EVM_CALL = 0x00000080,
+  EVM_SEND = 0x00000081,
+
+  // AMM / Liquidity Pool standards (0x90+)
+  AMM_SWAP = 0x00000090,
+  AMM_ADD_LIQ = 0x00000091,
+  AMM_REMOVE_LIQ = 0x00000092,
+}
+
+export interface RelayTxPayload {
+  /** Standardized Method ID */
+  methodId: StandardMethodId | number;
+  /** Destination (Username/DNS, Address, or Chain ID) */
+  to: string;
+  /** Payload data (Raw hex, JSON string, or Encrypted blob) */
+  data: string;
+}
+
+// ============================================================
 // Market Types
 // ============================================================
 

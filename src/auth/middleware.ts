@@ -159,7 +159,7 @@ export function requireAuth(
       res.status(500).json({
         ok: false,
         error: 'Authentication error',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   };
@@ -398,9 +398,9 @@ export function challengeVerificationHandler() {
       });
 
     } catch (error) {
-      res.status(401).json({
+      return res.status(401).json({
         ok: false,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   };
@@ -420,19 +420,19 @@ export function optionalAuth(resourceId: string) {
       if (authHeader && authHeader.startsWith('Bearer ')) {
         try {
           tokenData = JSON.parse(Buffer.from(authHeader.substring(7), 'base64').toString());
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (!tokenData && req.query.wstf_token) {
         try {
           tokenData = JSON.parse(Buffer.from(req.query.wstf_token as string, 'base64').toString());
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (!tokenData && req.cookies?.wstf_auth) {
         try {
           tokenData = JSON.parse(Buffer.from(req.cookies.wstf_auth, 'base64').toString());
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (tokenData && wstfAuth.validateToken(tokenData) && tokenData.aud === resourceId) {

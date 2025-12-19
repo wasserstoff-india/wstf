@@ -203,6 +203,58 @@ async function authorizeWithToken(
 }
 
 /**
+ * "Closed Box" Secure Context
+ * 
+ * Securely gates access to sensitive variables and environment data.
+ */
+export class SecureContext {
+  private secrets = new Map<string, any>();
+
+  constructor(private authorizedCallers?: string[]) { }
+
+  /**
+   * Set a secret in the closed box
+   */
+  setSecret(key: string, value: any) {
+    this.secrets.set(key, value);
+  }
+
+  /**
+   * Access a secret if the caller is authorized
+   */
+  getSecret(caller: string, key: string): any {
+    if (this.authorizedCallers && !this.authorizedCallers.includes(caller)) {
+      throw new Error(`Caller ${caller} is not authorized to access secrets`);
+    }
+    return this.secrets.get(key);
+  }
+
+  /**
+   * Run an action with full access to secrets
+   */
+  async runWithSecrets(caller: string, action: (secrets: Map<string, any>) => Promise<any>): Promise<any> {
+    if (this.authorizedCallers && !this.authorizedCallers.includes(caller)) {
+      throw new Error(`Unauthorized access by ${caller}`);
+    }
+    return action(new Map(this.secrets));
+  }
+}
+
+/**
+ * Standardized Method Request Handler
+ */
+export async function handleStandardRequest(
+  methodId: number,
+  caller: string,
+  data: any,
+  context: SecureContext
+): Promise<ServiceResponse> {
+  // Logic to route based on methodId (0x70, 0x71, etc.)
+  // This would be customized by the specific RPC implementation
+  return successResponse({ methodId, caller, processedAt: Date.now() });
+}
+
+/**
  * Create an in-memory public key cache
  */
 export function createPublicKeyCache(

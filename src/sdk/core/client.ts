@@ -51,6 +51,8 @@ import type {
 export interface ClientConfig {
   /** RPC endpoint URL (or in-memory RPC instance for testing) */
   rpc: string | SimpleRPCService;
+  /** Signer instance */
+  signer?: any;
   /** Default timeout for RPC calls in milliseconds */
   timeoutMs?: number;
   /** Default trust tier to wait for */
@@ -66,7 +68,7 @@ export interface ClientConfig {
 /**
  * Default client configuration.
  */
-export const DEFAULT_CLIENT_CONFIG: Required<Omit<ClientConfig, 'rpc'>> = {
+export const DEFAULT_CLIENT_CONFIG: Required<Omit<ClientConfig, 'rpc' | 'signer'>> = {
   timeoutMs: 30000,
   defaultTrustTier: TrustTier.INCLUDED,
   retry: {
@@ -81,11 +83,30 @@ export const DEFAULT_CLIENT_CONFIG: Required<Omit<ClientConfig, 'rpc'>> = {
 // ============================================================================
 
 /**
+ * SDK RPC Client interface.
+ */
+export interface WSTFClient {
+  rpc: string | SimpleRPCService;
+  getCapabilities(): Promise<SdkResult<any>>;
+  submitInstruction(instruction: any): Promise<string>;
+  queryEvents(query: any): Promise<any[]>;
+  getHeight(): Promise<SdkResult<bigint>>;
+  getBlock(heightOrHash: bigint | Hex32): Promise<SdkResult<BlockSummary>>;
+  getNonce(address: Address): Promise<SdkResult<bigint>>;
+  getNativeBalance(address: Address): Promise<SdkResult<bigint>>;
+  getAccount(address: Address): Promise<SdkResult<AccountInfo>>;
+  estimateGas(tx: unknown): Promise<SdkResult<GasEstimate>>;
+  getTransaction(txHash: Hex32): Promise<SdkResult<TransactionInfo>>;
+  getReceipt(txHash: Hex32): Promise<SdkResult<TxReceipt>>;
+  waitForTx(txHash: Hex32, options?: WaitOptions): Promise<SdkResult<TxReceipt>>;
+}
+
+/**
  * SDK RPC Client.
  *
  * Provides typed access to chain state and transaction submission.
  */
-export class RpcClient {
+export class RpcClient implements WSTFClient {
   private config: Required<ClientConfig>;
   private rpcService: SimpleRPCService | null = null;
 
@@ -101,9 +122,58 @@ export class RpcClient {
     }
   }
 
+  /**
+   * Get the RPC URL or instance.
+   */
+  get rpc(): string | SimpleRPCService {
+    return this.config.rpc;
+  }
+
   // ==========================================================================
   // Chain State Queries
   // ==========================================================================
+
+  /**
+   * Get service capabilities.
+   */
+  async getCapabilities(): Promise<SdkResult<any>> {
+    const rpc = await this.getRpc();
+    // This is a special endpoint often available on WSTF services
+    const baseURL = typeof this.config.rpc === 'string'
+      ? this.config.rpc.replace(/\/+$/, '')
+      : (rpc as any).baseURL || '';
+
+    const response = await fetch(`${baseURL}/capabilities`);
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch capabilities' };
+    }
+    const data = await response.json();
+    return { success: true, data };
+  }
+
+  /**
+   * Submit an instruction to the chain.
+   */
+  async submitInstruction(instruction: any): Promise<string> {
+    const rpc = await this.getRpc();
+    const result = await (rpc as any).submitInstruction(instruction);
+    if (!result.ok || !result.data) {
+      throw new Error(result.error?.message || 'Failed to submit instruction');
+    }
+    return result.data;
+  }
+
+  /**
+   * Query events from the chain.
+   */
+  async queryEvents(query: any): Promise<any[]> {
+    const rpc = await this.getRpc();
+    const result = await (rpc as any).getLogs(query);
+    if (!result.ok || !result.data) {
+      return [];
+    }
+    return result.data;
+  }
 
   /**
    * Get current chain height.

@@ -160,7 +160,7 @@ export function WSTFAuthProvider({
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         isAuthenticated: false
       }));
     }
@@ -214,7 +214,7 @@ export function WSTFAuthProvider({
         token: null,
         user: null,
         resource: null,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       }));
     }
   }
@@ -284,7 +284,7 @@ export function WSTFAuthProvider({
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         isAuthenticated: false
       }));
       throw error;
@@ -438,7 +438,7 @@ export function LoginPrompt() {
       window.location.href = window.location.href;
 
     } catch (error) {
-      setError(error.message);
+      setError(error instanceof Error ? error.message : String(error));
     } finally {
       setIsLoading(false);
     }

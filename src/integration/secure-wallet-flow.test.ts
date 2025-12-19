@@ -65,7 +65,7 @@ describe('Secure Wallet Flow Integration', () => {
         })
       });
 
-      const registerResult = await registerResponse.json();
+      const registerResult = await registerResponse.json() as any;
       expect(registerResult.ok).toBe(true);
       expect(registerResult.registered).toBe(true);
       console.log(`   ✅ Registered: ${registerResult.address}`);
@@ -101,7 +101,7 @@ describe('Secure Wallet Flow Integration', () => {
         })
       });
 
-      const sessionResult = await sessionResponse.json();
+      const sessionResult = await sessionResponse.json() as any;
       expect(sessionResult.ok).toBe(true);
       expect(sessionResult.sessionId).toBeDefined();
       console.log(`   Session ID: ${sessionResult.sessionId}`);
@@ -125,7 +125,7 @@ describe('Secure Wallet Flow Integration', () => {
       // 🔍 Step 6: Verify session is accessible
       console.log('🔍 Verifying session access...');
       const sessionInfoResponse = await fetch(`${serviceUrl}/accounts/session/${sessionResult.sessionId}`);
-      const sessionInfo = await sessionInfoResponse.json();
+      const sessionInfo = await sessionInfoResponse.json() as any;
 
       expect(sessionInfo.ok).toBe(true);
       expect(sessionInfo.userAddress).toBe(clientSigner.address);
@@ -162,7 +162,7 @@ describe('Secure Wallet Flow Integration', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
       expect(result.ok).toBe(true);
       console.log(`   ✅ Registered paper wallet: ${result.address}`);
 
@@ -214,9 +214,10 @@ describe('Secure Wallet Flow Integration', () => {
           })
         });
 
-        const result = await response.json();
+        const result = await response.json() as any; // Cast existing result to any
         expect(result.ok).toBe(true);
         console.log(`   ✅ Registered ${alg}: ${result.address}`);
+
       }
 
       // Test signing with both

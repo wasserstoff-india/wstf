@@ -57,7 +57,7 @@ router.post('/challenge', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Challenge generation failed: ${error.message}`
+      error: `Challenge generation failed: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -126,7 +126,7 @@ router.post('/resources', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Resource creation failed: ${error.message}`
+      error: `Resource creation failed: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -165,7 +165,7 @@ router.get('/resources/:resourceId', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to get resource: ${error.message}`
+      error: `Failed to get resource: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -205,7 +205,7 @@ router.get('/resources/:resourceId/acl', requireAuth(':resourceId', { level: 'ad
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to get ACL: ${error.message}`
+      error: `Failed to get ACL: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -261,7 +261,7 @@ router.post('/resources/:resourceId/grant-access', requireAuth(':resourceId', { 
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to grant access: ${error.message}`
+      error: `Failed to grant access: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -302,7 +302,7 @@ router.post('/resources/:resourceId/revoke-access', requireAuth(':resourceId', {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to revoke access: ${error.message}`
+      error: `Failed to revoke access: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -338,7 +338,7 @@ router.get('/my-resources', optionalAuth('*'), async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to get owned resources: ${error.message}`
+      error: `Failed to get owned resources: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -377,7 +377,7 @@ router.get('/my-access', optionalAuth('*'), async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to get accessible resources: ${error.message}`
+      error: `Failed to get accessible resources: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -408,7 +408,7 @@ router.post('/resources/:resourceId/gated-url', requireAuth(':resourceId'), asyn
   } catch (error) {
     res.status(500).json({
       ok: false,
-      error: `Failed to generate gated URL: ${error.message}`
+      error: `Failed to generate gated URL: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });

@@ -360,9 +360,9 @@ function UserProfile() {
         'Authorization': `Bearer ${btoa(JSON.stringify(auth.token))}`
       }
     })
-    .then(res => res.json())
-    .then(data => setProfile(data.profile))
-    .catch(console.error);
+      .then(res => res.json())
+      .then(data => setProfile(data.profile))
+      .catch(console.error);
   }, []);
 
   return (
@@ -423,9 +423,9 @@ function AdminPanel() {
         'Authorization': `Bearer ${btoa(JSON.stringify(auth.token))}`
       }
     })
-    .then(res => res.json())
-    .then(data => setUsers(data.users))
-    .catch(console.error);
+      .then(res => res.json())
+      .then(data => setUsers(data.users))
+      .catch(console.error);
   }, []);
 
   return (
@@ -473,7 +473,7 @@ function BridgeSection() {
   const permissions = usePermissions();
   const auth = useWSTFAuth();
   const [bridgeRoutes, setBridgeRoutes] = useState([]);
-  const [bridgeError, setBridgeError] = useState(null);
+  const [bridgeError, setBridgeError] = useState<string | null>(null);
 
   // Try to access bridge API
   useEffect(() => {

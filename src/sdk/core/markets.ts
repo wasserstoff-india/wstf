@@ -142,10 +142,10 @@ export interface MarketStats {
  */
 export class MarketsSDK {
   private client: RpcClient;
-  private signer: Signer;
+  private signer?: Signer;
   private programId: string;
 
-  constructor(client: RpcClient, signer: Signer, programId: string = 'markets') {
+  constructor(client: RpcClient, signer?: Signer, programId: string = 'markets') {
     this.client = client;
     this.signer = signer;
     this.programId = programId;
@@ -213,13 +213,13 @@ export class MarketsSDK {
     return this.client.getOrder(orderId);
   }
 
-  /**
-   * Get all orders for the signer.
-   */
   async getMyOrders(options?: {
     marketId?: MarketId;
     status?: OrderStatus;
   }): Promise<SdkResult<OrderView[]>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     return this.client.getOrders(this.signer.address, options?.marketId);
   }
 
@@ -313,6 +313,9 @@ export class MarketsSDK {
     params: CreateMarketSdkParams,
     options?: WaitOptions
   ): Promise<SdkResult<{ marketId: MarketId; receipt: TxReceipt }>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['market:create']);
 
     return {
@@ -329,6 +332,9 @@ export class MarketsSDK {
     marketId: MarketId,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['market:admin']);
 
     return {
@@ -345,6 +351,9 @@ export class MarketsSDK {
     marketId: MarketId,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['market:admin']);
 
     return {
@@ -365,6 +374,9 @@ export class MarketsSDK {
     params: PlaceOrderSdkParams,
     options?: WaitOptions
   ): Promise<SdkResult<PlaceOrderResult>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['order:place']);
 
     // Validate params
@@ -412,6 +424,9 @@ export class MarketsSDK {
     orderId: OrderId,
     options?: WaitOptions
   ): Promise<SdkResult<CancelOrderResult>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['order:cancel']);
 
     return {
@@ -428,6 +443,9 @@ export class MarketsSDK {
     orderIds: OrderId[],
     options?: WaitOptions
   ): Promise<SdkResult<CancelOrderResult[]>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['order:cancel']);
 
     return {
@@ -470,6 +488,9 @@ export class MarketsSDK {
     params: CreateGridSdkParams,
     options?: WaitOptions
   ): Promise<SdkResult<CreateGridResult>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['grid:create']);
 
     // Validate params
@@ -503,6 +524,9 @@ export class MarketsSDK {
     gridId: GridId,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['grid:cancel']);
 
     return {
@@ -519,6 +543,9 @@ export class MarketsSDK {
     gridId: GridId,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['grid:admin']);
 
     return {
@@ -535,6 +562,9 @@ export class MarketsSDK {
     gridId: GridId,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['grid:admin']);
 
     return {
@@ -557,6 +587,9 @@ export class MarketsSDK {
     amount: bigint,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['escrow:deposit']);
 
     return {
@@ -575,6 +608,9 @@ export class MarketsSDK {
     amount: bigint,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['escrow:withdraw']);
 
     return {
@@ -687,7 +723,7 @@ export class MarketsSDK {
  */
 export function createMarketsSDK(
   client: RpcClient,
-  signer: Signer,
+  signer?: Signer,
   programId?: string
 ): MarketsSDK {
   return new MarketsSDK(client, signer, programId);

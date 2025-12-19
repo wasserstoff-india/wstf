@@ -108,7 +108,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(400);
       expect(result.ok).toBe(false);
@@ -139,7 +139,7 @@ describe('Secure Accounts Service', () => {
         body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(409);
       expect(result.ok).toBe(false);
@@ -177,7 +177,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -201,7 +201,7 @@ describe('Secure Accounts Service', () => {
 
       // Get session info
       const response = await fetch(`${serverUrl}/accounts/session/${sessionData.sessionId}`);
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -227,7 +227,7 @@ describe('Secure Accounts Service', () => {
       const response = await fetch(`${serverUrl}/accounts/session/${sessionData.sessionId}`, {
         method: 'DELETE'
       });
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -249,7 +249,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(404);
       expect(result.ok).toBe(false);
@@ -265,7 +265,7 @@ describe('Secure Accounts Service', () => {
         body: JSON.stringify({})
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -278,7 +278,7 @@ describe('Secure Accounts Service', () => {
     it('should accept WebAuthn registration (placeholder)', async () => {
       const mockWebAuthnData = {
         credentialId: 'mock_credential_id',
-        publicKey: 'bW9ja19wdWJsaWNfa2V5', // base64 encoded mock
+        publicKey: 'YmFzZTY0X21vY2tfY29udGVudF9hdF9sZWFzdF8zMl9ieXRlc19mb3JfdmFsaWRhdGlvbg==', // base64 encoded mock > 32 bytes
         clientData: '{"type":"webauthn.create","challenge":"mock_challenge"}',
         attestation: 'mock_attestation'
       };
@@ -289,7 +289,7 @@ describe('Secure Accounts Service', () => {
         body: JSON.stringify(mockWebAuthnData)
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -302,7 +302,7 @@ describe('Secure Accounts Service', () => {
   describe('Service Capabilities', () => {
     it('should expose secure service capabilities', async () => {
       const response = await fetch(`${serverUrl}/capabilities`);
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.service).toBe('accounts');
@@ -316,7 +316,7 @@ describe('Secure Accounts Service', () => {
 
     it('should list all secure endpoints', async () => {
       const response = await fetch(`${serverUrl}/capabilities`);
-      const result = await response.json();
+      const result = await response.json() as any;
 
       const endpointPaths = result.endpoints.map((ep: any) => ep.path);
       expect(endpointPaths).toContain('/accounts/register');
@@ -355,7 +355,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
@@ -378,7 +378,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);
     });
@@ -424,7 +424,7 @@ describe('Secure Accounts Service', () => {
           }) : undefined
         });
 
-        const result = await response.json();
+        const result = await response.json() as any;
 
         // Ensure no private key data in any response
         const responseText = JSON.stringify(result);
@@ -456,7 +456,7 @@ describe('Secure Accounts Service', () => {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       expect(response.status).toBe(200);
       expect(result.ok).toBe(true);

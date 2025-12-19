@@ -98,7 +98,7 @@ export class BridgeSDK {
 
   constructor(config: BridgeSDKConfig) {
     this.client = createClient({
-      baseURL: config.rpcUrl,
+      rpc: config.rpcUrl,
       signer: config.signer
     });
     this.registryUrl = config.registryUrl || `${config.rpcUrl.replace(/\/+$/, '')}/bridge`;
@@ -112,7 +112,7 @@ export class BridgeSDK {
   setSigner(signer: KeypairSigner): void {
     this.signer = signer;
     this.client = createClient({
-      baseURL: this.client.baseURL,
+      rpc: this.client.rpc,
       signer
     });
   }
@@ -146,15 +146,13 @@ export class BridgeSDK {
       ...(criteria?.includeOnlyProviders && { includeOnlyProviders: criteria.includeOnlyProviders.join(',') })
     });
 
-    const response = await fetch(`${this.registryUrl}/routes/discover?${params}`, {
-      timeout: this.timeout
-    });
+    const response = await fetch(`${this.registryUrl}/routes/discover?${params}`);
 
     if (!response.ok) {
       throw new Error(`Route discovery failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     if (!data.ok) {
       throw new Error(data.error);
     }
@@ -443,7 +441,7 @@ export class BridgeSDK {
       })
     });
 
-    const data = await response.json();
+    const data = await response.json() as any;
     return data;
   }
 
@@ -473,7 +471,7 @@ export class BridgeSDK {
       body: JSON.stringify(fullRoute)
     });
 
-    const data = await response.json();
+    const data = await response.json() as any;
     return data;
   }
 
@@ -487,7 +485,7 @@ export class BridgeSDK {
     }
 
     const response = await fetch(`${this.registryUrl}/providers/${providerAddress}/routes`);
-    const data = await response.json();
+    const data = await response.json() as any;
 
     if (!data.ok) {
       throw new Error(data.error);
@@ -506,7 +504,7 @@ export class BridgeSDK {
     }
 
     const response = await fetch(`${this.registryUrl}/providers/${providerAddress}/stats`);
-    const data = await response.json();
+    const data = await response.json() as any;
 
     if (!data.ok) {
       throw new Error(data.error);
@@ -530,7 +528,7 @@ export class BridgeSDK {
     confirmations: number;
   }>> {
     const response = await fetch(`${this.registryUrl}/chains/supported`);
-    const data = await response.json();
+    const data = await response.json() as any;
 
     if (!data.ok) {
       throw new Error(data.error);
@@ -544,7 +542,7 @@ export class BridgeSDK {
    */
   async getCommonTokens(): Promise<Record<string, any>> {
     const response = await fetch(`${this.registryUrl}/tokens/common`);
-    const data = await response.json();
+    const data = await response.json() as any;
 
     if (!data.ok) {
       throw new Error(data.error);
@@ -568,7 +566,7 @@ export class BridgeSDK {
       body: JSON.stringify(request)
     });
 
-    return await response.json();
+    return await response.json() as any;
   }
 
   /**
@@ -581,7 +579,7 @@ export class BridgeSDK {
     supportedChainPairs: Array<{ src: ChainId; dst: ChainId; routes: number }>;
   }> {
     const response = await fetch(`${this.registryUrl}/registry/stats`);
-    const data = await response.json();
+    const data = await response.json() as any;
 
     if (!data.ok) {
       throw new Error(data.error);

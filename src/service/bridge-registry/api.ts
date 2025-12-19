@@ -5,7 +5,7 @@
  * Integrates with the registry and instruction system.
  */
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { BridgeRegistry, RouteSelectionCriteria } from './registry';
 import {
   BridgeRoute,
@@ -32,7 +32,7 @@ const registry = new BridgeRegistry();
  * GET /bridge/routes/discover
  * Discover optimal routes for a bridge request
  */
-router.get('/routes/discover', async (req, res) => {
+router.get('/routes/discover', async (req: Request, res: Response) => {
   try {
     const {
       srcChainId,
@@ -100,10 +100,10 @@ router.get('/routes/discover', async (req, res) => {
       }))
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(500).json({
       ok: false,
-      error: `Route discovery failed: ${error}`
+      error: `Action failed: ${error instanceof Error ? error.message : String(error)}`
     });
   }
 });
@@ -112,7 +112,7 @@ router.get('/routes/discover', async (req, res) => {
  * POST /bridge/routes/register
  * Register a new bridge route (for providers)
  */
-router.post('/routes/register', async (req, res) => {
+router.post('/routes/register', async (req: Request, res: Response) => {
   try {
     const routeData = req.body as BridgeRoute;
 
@@ -159,7 +159,7 @@ router.post('/routes/register', async (req, res) => {
  * POST /bridge/providers/register
  * Register a new bridge provider
  */
-router.post('/providers/register', async (req, res) => {
+router.post('/providers/register', async (req: Request, res: Response) => {
   try {
     const providerData = req.body as BridgeProviderRegistration;
 
@@ -190,7 +190,7 @@ router.post('/providers/register', async (req, res) => {
  * GET /bridge/providers/:provider/routes
  * Get all routes for a specific provider
  */
-router.get('/providers/:provider/routes', (req, res) => {
+router.get('/providers/:provider/routes', (req: Request, res: Response) => {
   try {
     const { provider } = req.params;
     const routes = registry.getProviderRoutes(provider);
@@ -227,7 +227,7 @@ router.get('/providers/:provider/routes', (req, res) => {
  * GET /bridge/providers/:provider/stats
  * Get provider performance statistics
  */
-router.get('/providers/:provider/stats', (req, res) => {
+router.get('/providers/:provider/stats', (req: Request, res: Response) => {
   try {
     const { provider } = req.params;
     const stats = registry.getProviderStats(provider);
@@ -266,7 +266,7 @@ router.get('/providers/:provider/stats', (req, res) => {
  * GET /bridge/routes/:routeId/metrics
  * Get route performance metrics
  */
-router.get('/routes/:routeId/metrics', (req, res) => {
+router.get('/routes/:routeId/metrics', (req: Request, res: Response) => {
   try {
     const { routeId } = req.params;
     const metrics = registry.getRouteMetrics(routeId);
@@ -305,7 +305,7 @@ router.get('/routes/:routeId/metrics', (req, res) => {
  * GET /bridge/registry/stats
  * Get overall registry statistics
  */
-router.get('/registry/stats', (req, res) => {
+router.get('/registry/stats', (req: Request, res: Response) => {
   try {
     const stats = registry.getRegistryStats();
 
@@ -326,7 +326,7 @@ router.get('/registry/stats', (req, res) => {
  * GET /bridge/chains/supported
  * Get list of supported chains and their details
  */
-router.get('/chains/supported', (req, res) => {
+router.get('/chains/supported', (req: Request, res: Response) => {
   try {
     res.json({
       ok: true,
@@ -351,7 +351,7 @@ router.get('/chains/supported', (req, res) => {
  * GET /bridge/tokens/common
  * Get common token addresses across chains
  */
-router.get('/tokens/common', (req, res) => {
+router.get('/tokens/common', (req: Request, res: Response) => {
   try {
     res.json({
       ok: true,
@@ -370,7 +370,7 @@ router.get('/tokens/common', (req, res) => {
  * POST /bridge/request/validate
  * Validate a bridge request before submission
  */
-router.post('/request/validate', async (req, res) => {
+router.post('/request/validate', async (req: Request, res: Response) => {
   try {
     const request = req.body as BridgeRequest;
 
@@ -434,7 +434,7 @@ router.post('/request/validate', async (req, res) => {
  * POST /bridge/request/compile
  * Compile a high-level bridge request into a binary instruction
  */
-router.post('/request/compile', (req, res) => {
+router.post('/request/compile', (req: Request, res: Response) => {
   try {
     const request = req.body as BridgeRequest;
 

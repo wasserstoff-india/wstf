@@ -1,6 +1,6 @@
 {
   "name": "wstfchain",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "WSTFChain - Production blockchain with cross-chain bridge coordination and access control",
   "main": "dist/index.js",
   "bin": {
@@ -19,6 +19,7 @@
     "start:minimal": "ts-node src/runner/cli.ts start --profile=minimal",
     "start:full": "ts-node src/runner/cli.ts start --profile=full",
     "test": "vitest run",
+    "test:full": "vitest run",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:ui": "vitest --ui",
@@ -75,9 +76,13 @@
     "fastify": "^5.6.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitest/ui": "^4.0.12",
     "esbuild": "^0.24.2",
+    "react": "^19.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.12"

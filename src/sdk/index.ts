@@ -71,7 +71,7 @@ export type {
 export { createEnhancedBridgeModule } from './bridge/enhanced-bridge';
 
 // Access control module
-export type { AccessPermission, AccessGuardStatus } from '../frontend-sdk/types';
+// export type { AccessPermission, AccessGuardStatus } from '../frontend-sdk/types';
 
 // Re-export existing stable modules
 export * from './core';

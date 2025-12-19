@@ -57,6 +57,7 @@ export interface NetworkProfile {
     p2p?: string;
   };
   explorerUrl?: string;       // external block explorer
+  bridgeRegistryUrl?: string; // bridge-specific registry
 }
 
 /**

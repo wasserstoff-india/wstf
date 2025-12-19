@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { WSTFSimulator } from './simulator';
 import { instructionBuilder } from './decoder';
 import { XChainOpcode } from '../../instructions/xchain/opcodes';
+import { BridgeProviderRegistration } from '../../instructions/xchain/types';
 
 describe('Complete Bridge Flow', () => {
   let simulator: WSTFSimulator;
@@ -108,7 +109,7 @@ describe('Complete Bridge Flow', () => {
     console.log('✅ Instruction created successfully:');
     console.log(`   Opcode: 0x${instruction.opcode.toString(16)}`);
     console.log(`   Sender: ${instruction.sender}`);
-    console.log(`   Data: ${JSON.stringify(instruction.data, null, 2)}`);
+    console.log(`   Data: ${JSON.stringify(instruction.data, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2)}`);
 
     // Test simulation
     const simResult = await simulator.simulateInstruction(instruction);
@@ -125,20 +126,21 @@ describe('Complete Bridge Flow', () => {
     const providerName = 'Lightning Bridge Co.';
 
     // 1. Register as provider
-    const providerRegistration = {
+    const providerRegistration: BridgeProviderRegistration = {
       provider: providerAddress,
       name: providerName,
-      description: 'Fast and reliable cross-chain bridges',
+      description: 'Test bridge provider for integration tests',
+      website: 'https://lightningbridge.io',
       supportedChains: ['bsc', 'polygon', 'ethereum'],
-      minimumStake: 10000n * 1000000n,
+      minimumStake: 1000000n,
       contactInfo: {
-        email: 'support@lightningbridge.io'
+        email: 'contact@lightningbridge.io'
       },
-      emergencyContact: providerAddress,
+      emergencyContact: 'gc1emergency123456789abcdef',
       slaCommitments: {
         maxConfirmationTime: 300,
         uptimeGuarantee: 99.5,
-        refundPolicy: 'Full refund within 24h'
+        refundPolicy: 'Full refund if confirmation exceeds max time'
       }
     };
 
@@ -311,7 +313,12 @@ describe('Bridge Route Mechanics', () => {
     const provider = {
       name: 'Test Provider',
       initialTrust: 500,
-      transactions: []
+      transactions: [] as Array<{
+        id: number,
+        success: boolean,
+        timelyCompletion: boolean,
+        timestamp: number
+      }>
     };
 
     // Simulate 100 transactions with varying success rates

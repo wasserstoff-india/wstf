@@ -3,6 +3,7 @@
  */
 
 import type { NetworkName, ClusterInfo, ServiceCapabilities } from '../types';
+export type { NetworkName, ClusterInfo, ServiceCapabilities };
 
 /**
  * Network profile for connecting to different environments

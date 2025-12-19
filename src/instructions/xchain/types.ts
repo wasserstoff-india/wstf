@@ -160,6 +160,29 @@ export interface BridgeProviderStats {
 }
 
 /**
+ * Bridge provider registration data
+ */
+export interface BridgeProviderRegistration {
+  provider: string;          // WSTF address
+  name: string;             // Provider name
+  description: string;      // Provider description
+  website: string;          // Provider website
+  supportedChains: ChainId[]; // Chain IDs this provider supports
+  minimumStake: bigint;     // Required stake amount
+  contactInfo: {
+    email?: string;
+    telegram?: string;
+    discord?: string;
+  };
+  emergencyContact: string; // Emergency contact address
+  slaCommitments: {
+    maxConfirmationTime: number; // Seconds
+    uptimeGuarantee: number;     // Percentage (95 = 95%)
+    refundPolicy: string;        // Description of refund policy
+  };
+}
+
+/**
  * Bridge route metrics
  */
 export interface BridgeRouteMetrics {

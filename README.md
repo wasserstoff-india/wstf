@@ -1,9 +1,9 @@
-# WSTFChain v1.0 🚀
+# WSTFChain v1.1 🚀
 
 <!-- Version & Release -->
-![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.0-blue?style=flat-square)
 ![SDK](https://img.shields.io/badge/SDK-Production%20Ready-success?style=flat-square)
-![Frontend Kit](https://img.shields.io/badge/Frontend%20Kit-1.0.0-green?style=flat-square)
+![Frontend Kit](https://img.shields.io/badge/Frontend%20Kit-1.1.0-green?style=flat-square)
 
 <!-- CI & Build Status -->
 [![CI](https://github.com/wasserstoff-india/wstf/actions/workflows/ci.yml/badge.svg)](https://github.com/wasserstoff-india/wstf/actions/workflows/ci.yml)
@@ -178,6 +178,12 @@ WSTFChain is a **programmable instruction plane** for the multi-chain world:
 | **Produce blocks** | Builder mines at configurable target; validator re-executes and checks roots |
 | **Fork choice** | Cumulative-work tip selection with reorg handling |
 | **On-chain orderbook** | Markets module with LP grids, escrow, OCC, bounded matching |
+| **Zk-RPC & DNS** | Username-DNS mapped RPC routing for opaque transaction relaying |
+| **Closed Box Execute**| SecureContext gated secret access for protected service operations |
+| **Token Showcase** | Integrated TOK_DEPLOY and TOK_MINT_PROTECTED demo via VaultService |
+| **Bridge Marketplace**| Multi-provider route discovery with competitive fee matching |
+| **Trust Scoring** | Dynamic trust scoring (0-1000) based on successful completions |
+| **Zero-Trust Keys** | Enforced client-side only key generation (No server-held private keys) |
 
 ---
 
@@ -191,7 +197,7 @@ cd wstf
 # Install & build
 npm install && npm run build
 
-# Run all tests (607 passing)
+# Run all tests (1369 passing)
 npm run test:full
 
 # Start services
@@ -274,14 +280,15 @@ src/
 │   └── logs/            # Indexed event logs with topics
 ├── programs/            # Program registry and policies
 ├── service/             # Service connector SDK
-│   └── connector/       # Auth flow, mood game harness
+│   ├── connector/       # Auth flow, SecureContext, mood game harness
+│   └── demo/            # Power Showcase: VaultService & Token Demo
 ├── trust/               # Trust tiers, confirmation tracking
 ├── fastpath/            # Hot Window, Preflight, Journal
 ├── economics/           # Gas metering, fees, rent, balances
 ├── paymaster/           # Sponsorship, vouchers
-├── rpc/                 # RPC services (simple + enhanced)
 ├── accounts/            # Account state management
-├── validator/           # Transaction validation
+├── validator/           # Transaction validation & opaque relaying
+├── rpc/                 # RPC services (DNS Resolver, standard endpoints)
 ├── p2p/                 # Gossip protocol, peer management
 ├── mempool/             # Transaction pool with policies
 ├── block/               # Block types, PoW, Merkle roots
@@ -613,6 +620,40 @@ const response = await moodHandler(request, deps, config);
 | No balance | OK | OK | FAIL | - | angry | 402 |
 | Upstream down | OK | OK | OK | FAIL | angry | 502 |
 | Rate limited | OK | OK | OK | - | angry | 429 |
+
+---
+
+## Zk-RPC & Modular Identity
+
+WSTFChain v1.0 introduces a **Zero-Knowledge RPC** architecture designed for privacy and modularity.
+
+### 🌐 Username DNS Resolver
+Usernames are no longer just aliases; they are mapped to specific RPC endpoints via the `globalDns` resolver. This allows the network to route transactions to the correct execution environment based on the recipient's "@username".
+
+```typescript
+import { globalDns } from './rpc/dns-resolver';
+
+// Resolve an RPC endpoint for a user
+const endpoint = globalDns.resolve('@my_vault');
+```
+
+### 📦 "Closed Box" Execution
+Services operate as "Closed Boxes" using the `SecureContext`. Sensitive data (like private keys or API secrets) are protected and only accessible to authorized callers after cryptographic verification.
+
+1.  **Identity Verification**: The `SecureContext` verifies the caller's multi-curve signature.
+2.  **Secret Gating**: Only if the caller is in the authorized list can they retrieve the protected resource.
+
+### 🛡️ Opaque Transaction Relaying
+The Validator acts as an **Opaque Relay**. It verifies the sender's signature on a `BasicTx` but does not need to decrypt or understand the `Data` payload. It simply forwards the blob to the target RPC resolved via DNS.
+
+---
+
+## Token Showcase (VaultService)
+
+A reference implementation of a protected service is available in `src/service/demo/vaultService.ts`.
+
+- **`TOK_DEPLOY`**: Allows any user to deploy a new token.
+- **`TOK_MINT_PROTECTED`**: A restricted operation that uses the "Closed Box" model to access a treasury key for minting.
 
 ---
 

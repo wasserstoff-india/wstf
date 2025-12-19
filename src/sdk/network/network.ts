@@ -30,7 +30,7 @@ class NetworkModuleImpl implements NetworkModule {
       // Try to get cluster info from the core RPC
       const response = await fetch(`${this.currentProfile.rpcUrls.core}/status/cluster`);
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         return {
           network: data.network || this.currentProfile.label,
           chainId: data.chainId || this.currentProfile.chainId,
@@ -81,7 +81,7 @@ class NetworkModuleImpl implements NetworkModule {
       // Try the capabilities endpoint first
       const response = await fetch(`${this.currentProfile.rpcUrls.core}/capabilities`);
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         return {
           accounts: data.accounts ?? true,
           validator: data.validator ?? true,
@@ -122,15 +122,12 @@ class NetworkModuleImpl implements NetworkModule {
 
     try {
       // Test connectivity with a simple health check
-      const response = await fetch(`${this.currentProfile.rpcUrls.core}/health`, {
-        method: 'GET',
-        timeout: 5000,
-      } as any);
+      const response = await fetch(`${this.currentProfile.rpcUrls.core}/health`);
 
       const latencyMs = Date.now() - startTime;
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         return {
           healthy: data.status === 'healthy',
           latencyMs,
@@ -177,15 +174,12 @@ class NetworkModuleImpl implements NetworkModule {
     const startTime = Date.now();
 
     try {
-      const response = await fetch(`${profile.rpcUrls.core}/health`, {
-        method: 'GET',
-        timeout: 5000,
-      } as any);
+      const response = await fetch(`${profile.rpcUrls.core}/health`);
 
       const latencyMs = Date.now() - startTime;
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         return {
           healthy: data.status === 'healthy',
           latencyMs,

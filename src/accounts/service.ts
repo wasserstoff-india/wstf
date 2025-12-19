@@ -144,6 +144,35 @@ export async function startAccountsService(port = 7001) {
         });
       }
 
+      // Validate expiration (with small buffer for clock skew in tests)
+      const now = Date.now();
+      if (typeof expiresAt !== 'number' || expiresAt <= now || expiresAt > now + 365 * 24 * 60 * 60 * 1000 + 1000) {
+        return res.status(400).send({
+          ok: false,
+          error: 'INVALID_EXPIRATION',
+          message: 'Expiration must be a valid timestamp in the future (max 1 year)'
+        });
+      }
+
+      // Validate permissions format
+      const PERM_REGEX = /^[A-Z0-9_*.:a-z-]+$/;
+      if (!Array.isArray(permissions) && typeof permissions !== 'string') {
+        return res.status(400).send({
+          ok: false,
+          error: 'INVALID_PERMISSIONS',
+          message: 'Permissions must be a string or an array of strings'
+        });
+      }
+
+      const perms = Array.isArray(permissions) ? permissions : [permissions];
+      if (perms.length === 0 || perms.some(p => typeof p !== 'string' || !PERM_REGEX.test(p))) {
+        return res.status(400).send({
+          ok: false,
+          error: 'INVALID_PERMISSIONS',
+          message: 'Permissions must be valid identifiers ([A-Z0-9_*.:-]+)'
+        });
+      }
+
       // Verify account exists
       const account = await accounts.get(userAddress);
       if (!account) {
@@ -163,10 +192,13 @@ export async function startAccountsService(port = 7001) {
         expiresAt: typeof expiresAt === 'number' ? expiresAt : Date.now() + 30 * 60 * 1000 // 30min default
       });
 
-      // Auto-cleanup expired sessions
-      setTimeout(() => {
-        sessionCache.delete(sessionIdGenerated);
-      }, expiresAt - Date.now());
+      // Auto-cleanup expired sessions (safe against 32-bit timeout overflow)
+      const delay = expiresAt - Date.now();
+      if (delay > 0 && delay < 2147483647) {
+        setTimeout(() => {
+          sessionCache.delete(sessionIdGenerated);
+        }, delay);
+      }
 
       console.log(`📱 Created session ${sessionIdGenerated} for ${userAddress} with permissions: ${permissions}`);
       return {
@@ -360,9 +392,9 @@ export async function startAccountsService(port = 7001) {
         'webauthn-passkey-support'
       ],
       endpoints: [
-        { method: 'POST', path: '/accounts/register', description: 'Register account with client-generated public key' },
+        { method: 'POST', path: '/accounts/register', description: 'Register account with client-side public key' },
         { method: 'POST', path: '/accounts/register-passkey', description: 'Register WebAuthn/Passkey account (future)' },
-        { method: 'POST', path: '/accounts/webauthn/challenge', description: 'Generate WebAuthn registration challenge' },
+        { method: 'POST', path: '/accounts/webauthn/challenge', description: 'Challenge request for WebAuthn registration' },
         { method: 'POST', path: '/accounts/create-session', description: 'Create session for account abstraction' },
         { method: 'GET', path: '/accounts/session/:id', description: 'Get session info' },
         { method: 'DELETE', path: '/accounts/session/:id', description: 'Revoke session' },

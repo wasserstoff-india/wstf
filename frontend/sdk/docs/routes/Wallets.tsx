@@ -23,7 +23,7 @@ import { Section, SectionCard, SectionGrid, CodePreview } from '../components';
 // ============================================================
 
 export const WalletsPage: React.FC = () => {
-  const { wallets, activeSigner, createWallet, disconnect } = useWallet();
+  const { wallets, wallet: activeSigner, createWallet, disconnect } = useWallet();
   const [showCode, setShowCode] = useState<string | null>(null);
   const [demoSecret, setDemoSecret] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export const WalletsPage: React.FC = () => {
       <div className="pb-4 border-b border-slate-800">
         <h1 className="text-2xl font-bold text-white">Wallet Components</h1>
         <p className="mt-1 text-sm text-slate-400">
-          Multi-algorithm wallet management with encrypted browser storage.
+          Multi-algorithm wallet management with encrypted browser storage and <strong>zero-trust</strong> key management.
         </p>
       </div>
 
@@ -85,6 +85,10 @@ export const WalletsPage: React.FC = () => {
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">+</span>
                 Create new wallets with Ed25519 or secp256k1
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-red-400">🛡️</span>
+                <strong>Zero Trust</strong>: Private keys generated client-side only
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">+</span>
@@ -264,7 +268,7 @@ function WalletManager() {
   const {
     // State
     wallets,           // WalletInfo[] - all stored wallets
-    activeSigner,      // Signer | null - currently unlocked wallet
+    wallet,            // Signer | null - currently unlocked wallet
     isConnecting,      // boolean - loading state
     error,             // string | null - error message
 

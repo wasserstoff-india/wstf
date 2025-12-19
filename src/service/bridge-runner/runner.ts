@@ -139,9 +139,9 @@ export class BridgeRunner extends EventEmitter {
     console.log('🔗 Connecting to WSTF chain...');
 
     this.wstfClient = createClient({
-      baseURL: this.config.wstfRpcUrl,
+      rpc: this.config.wstfRpcUrl,
       signer: this.config.wstfSigner
-    });
+    } as any);
 
     // Test connection
     const capabilities = await this.wstfClient.getCapabilities();
@@ -348,11 +348,11 @@ export class BridgeRunner extends EventEmitter {
         });
       });
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error handling bridge request ${requestId}:`, error);
       await this.reportBridgeResult(requestId, {
         status: 'failed',
-        reason: `Internal error: ${error.message}`
+        reason: `Internal error: ${error instanceof Error ? error.message : String(error)}`
       });
     }
   }
@@ -524,11 +524,12 @@ export class BridgeRunner extends EventEmitter {
     } catch (error) {
       console.error(`❌ Bridge ${requestId} failed:`, error);
       execution.status = 'failed';
-      execution.error = error.message;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      execution.error = errorMessage;
 
       await this.reportBridgeResult(requestId, {
         status: 'failed',
-        reason: error.message
+        reason: errorMessage
       });
     } finally {
       this.activeBridges.delete(requestId);

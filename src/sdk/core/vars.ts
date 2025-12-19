@@ -111,10 +111,10 @@ export interface ListVarsOptions {
  */
 export class VarsSDK {
   private client: RpcClient;
-  private signer: Signer;
+  private signer?: Signer;
   private programId: string;
 
-  constructor(client: RpcClient, signer: Signer, programId: string = 'vars') {
+  constructor(client: RpcClient, signer?: Signer, programId: string = 'vars') {
     this.client = client;
     this.signer = signer;
     this.programId = programId;
@@ -128,6 +128,9 @@ export class VarsSDK {
    * Get the signer's account namespace.
    */
   myNamespace(): string {
+    if (!this.signer) {
+      throw new Error('Signer required');
+    }
     return accountNamespace(this.signer.address) as string;
   }
 
@@ -308,6 +311,14 @@ export class VarsSDK {
       };
     }
 
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
+
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
+
     const authToken = this.signer.createScopedToken(this.programId, ['var:write']);
 
     return {
@@ -366,6 +377,10 @@ export class VarsSDK {
     key: string,
     options?: { expectedVersion?: bigint } & WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
+
     const authToken = this.signer.createScopedToken(this.programId, ['var:delete']);
 
     return {
@@ -392,6 +407,9 @@ export class VarsSDK {
     entries: Array<{ namespace: string; key: string }>,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['var:delete']);
 
     return {
@@ -429,6 +447,9 @@ export class VarsSDK {
       }
     }
 
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['var:write']);
 
     return {
@@ -451,6 +472,9 @@ export class VarsSDK {
     delta: bigint = 1n,
     options?: WaitOptions
   ): Promise<SdkResult<{ newValue: bigint; receipt: TxReceipt }>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['var:write']);
 
     return {
@@ -485,6 +509,9 @@ export class VarsSDK {
     permissions: Partial<VarPermissions>,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['var:admin']);
 
     return {
@@ -502,6 +529,9 @@ export class VarsSDK {
     grantee: Address,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['var:admin']);
 
     return {
@@ -518,7 +548,11 @@ export class VarsSDK {
     namespace: string,
     address?: Address
   ): Promise<SdkResult<VarPermissions>> {
-    const targetAddress = address ?? this.signer.address;
+    const targetAddress = address ?? this.signer?.address;
+
+    if (!targetAddress) {
+      return { success: false, error: 'Address or signer required', code: 'INVALID_INPUT' };
+    }
 
     return {
       success: false,
@@ -533,7 +567,7 @@ export class VarsSDK {
  */
 export function createVarsSDK(
   client: RpcClient,
-  signer: Signer,
+  signer?: Signer,
   programId?: string
 ): VarsSDK {
   return new VarsSDK(client, signer, programId);

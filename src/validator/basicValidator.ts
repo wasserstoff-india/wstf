@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { BasicTx, BASIC_TX_VERSION } from '../tx/basic';
-import { emptyPayloadHash, preimageBasic, integrityHash } from '../tx/hash';
+import { relayPayloadHash, emptyPayloadHash, preimageBasic, integrityHash } from '../tx/hash';
 import { decodeAddress, publicKeyMatchesAddress } from '../crypto/address';
 import { verifyPreimage } from '../crypto/sign';
 import { ValidationContext } from './context';
@@ -29,7 +29,14 @@ export async function validateBasicTx(
     return fail('BAD_NONCE', `Expected ${acc.nonce + 1n}, got ${tx.nonce}`);
   }
 
-  const expectedPayload = emptyPayloadHash().toString('hex');
+  // Verify payloadHash
+  let expectedPayload: string;
+  if (tx.methodId !== undefined && tx.to !== undefined && tx.data !== undefined) {
+    expectedPayload = relayPayloadHash(tx.methodId, tx.to, tx.data).toString('hex');
+  } else {
+    expectedPayload = emptyPayloadHash().toString('hex');
+  }
+
   if (tx.payloadHash !== expectedPayload) {
     return fail('BAD_PAYLOAD_HASH');
   }

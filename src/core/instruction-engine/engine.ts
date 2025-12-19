@@ -143,7 +143,7 @@ export class InstructionEngine {
     } catch (error) {
       return {
         success: false,
-        error: `Execution error: ${error.message}`,
+        error: `Execution error: ${error instanceof Error ? error.message : String(error)}`,
         events: [],
         stateChanges: [],
         gasUsed: this.gasTracker + 150000n
@@ -383,7 +383,7 @@ export class InstructionEngine {
       }
 
     } catch (error) {
-      errors.push(`Failed to validate bridge request: ${error.message}`);
+      errors.push(`Failed to validate bridge request: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     return errors;

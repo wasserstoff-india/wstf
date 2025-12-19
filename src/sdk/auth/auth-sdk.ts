@@ -140,16 +140,16 @@ export class WSTFAuthSDK {
         method: 'POST',
         body: JSON.stringify({
           resourceId,
-          publicKey: authSigner.publicKeyBase64
+          publicKey: Buffer.from(authSigner.getPublicKeyDER()).toString('base64')
         })
       });
 
       if (!challengeResponse.ok) {
-        const errorData = await challengeResponse.json();
+        const errorData = await challengeResponse.json() as any;
         return { success: false, error: errorData.error };
       }
 
-      const challengeData = await challengeResponse.json();
+      const challengeData = await challengeResponse.json() as any;
       if (!challengeData.ok) {
         return { success: false, error: challengeData.error };
       }
@@ -165,17 +165,17 @@ export class WSTFAuthSDK {
         method: 'POST',
         body: JSON.stringify({
           challengeId: challenge.challengeId,
-          publicKey: authSigner.publicKeyBase64,
+          publicKey: Buffer.from(authSigner.getPublicKeyDER()).toString('base64'),
           signature
         })
       });
 
       if (!verifyResponse.ok) {
-        const errorData = await verifyResponse.json();
+        const errorData = await verifyResponse.json() as any;
         return { success: false, error: errorData.error };
       }
 
-      const verifyData = await verifyResponse.json();
+      const verifyData = await verifyResponse.json() as any;
       if (!verifyData.ok) {
         return { success: false, error: verifyData.error };
       }
@@ -190,8 +190,8 @@ export class WSTFAuthSDK {
 
       return { success: true, token };
 
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -238,7 +238,7 @@ export class WSTFAuthSDK {
         return null;
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.ok ? data.user : null;
 
     } catch (error) {
@@ -300,7 +300,7 @@ export class WSTFAuthSDK {
         })
       });
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       if (!data.ok) {
         return { success: false, error: data.error };
@@ -308,8 +308,8 @@ export class WSTFAuthSDK {
 
       return { success: true, resource: data.resource };
 
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -319,7 +319,7 @@ export class WSTFAuthSDK {
   async getResource(resourceId: string): Promise<ResourceInfo | null> {
     try {
       const response = await this.fetchAPI(`/resources/${resourceId}`);
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.ok ? data.resource : null;
 
     } catch (error) {
@@ -340,7 +340,7 @@ export class WSTFAuthSDK {
         return null;
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.ok ? data.acl : null;
 
     } catch (error) {
@@ -370,11 +370,11 @@ export class WSTFAuthSDK {
         })
       });
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return { success: data.ok, error: data.ok ? undefined : data.error };
 
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -392,11 +392,11 @@ export class WSTFAuthSDK {
         body: JSON.stringify({ userPublicKey })
       });
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return { success: data.ok, error: data.ok ? undefined : data.error };
 
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -442,7 +442,7 @@ export class WSTFAuthSDK {
         return [];
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.ok ? data.resources : [];
 
     } catch (error) {
@@ -463,7 +463,7 @@ export class WSTFAuthSDK {
         return [];
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.ok ? data.resources : [];
 
     } catch (error) {
@@ -489,7 +489,7 @@ export class WSTFAuthSDK {
         body: JSON.stringify({ baseURL })
       });
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       if (!data.ok) {
         return { success: false, error: data.error };
@@ -501,8 +501,8 @@ export class WSTFAuthSDK {
         expiresAt: data.expiresAt
       };
 
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 

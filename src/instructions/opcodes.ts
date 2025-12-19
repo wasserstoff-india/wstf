@@ -66,6 +66,7 @@ export const SYS_SELECTORS = {
   TOK_GET: 0x00000038,           // Get token info (read-only)
   TOK_BALANCE: 0x00000039,       // Get balance (read-only)
   TOK_ALLOWANCE: 0x0000003a,     // Get allowance (read-only)
+  TOK_MINT_PROTECTED: 0x0000003b, // Protected mint (demo)
 
   // NFT-specific selectors
   NFT_CREATE_CLASS: 0x00000040,     // Create NFT class (for SFT)
@@ -91,6 +92,21 @@ export const SYS_SELECTORS = {
   MKT_GET_MARKET: 0x00000067,    // Get market info (read-only)
   MKT_GET_BOOK: 0x00000068,      // Get orderbook (read-only)
   MKT_GET_TRADES: 0x00000069,    // Get trade history (read-only)
+
+  // HTTP standardized methods (Relay/Modular Backend)
+  HTTP_GET: 0x00000070,
+  HTTP_POST: 0x00000071,
+  HTTP_PUT: 0x00000072,
+  HTTP_FETCH: 0x00000073,
+
+  // EVM Gateway selectors (0x80+)
+  EVM_CALL: 0x00000080,
+  EVM_SEND: 0x00000081,
+
+  // AMM / Liquidity Pool selectors (0x90+)
+  AMM_SWAP: 0x00000090,
+  AMM_ADD_LIQ: 0x00000091,
+  AMM_REMOVE_LIQ: 0x00000092,
 } as const;
 
 export type SysOpcode = keyof typeof SYS_SELECTORS;

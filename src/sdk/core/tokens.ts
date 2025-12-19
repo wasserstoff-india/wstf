@@ -230,10 +230,10 @@ export interface ApproveParams {
  */
 export class TokensSDK {
   private client: RpcClient;
-  private signer: Signer;
+  private signer?: Signer;
   private programId: string;
 
-  constructor(client: RpcClient, signer: Signer, programId: string = 'tokens') {
+  constructor(client: RpcClient, signer?: Signer, programId: string = 'tokens') {
     this.client = client;
     this.signer = signer;
     this.programId = programId;
@@ -259,7 +259,11 @@ export class TokensSDK {
    * Get fungible token balance.
    */
   async getBalance(tokenId: TokenId, holder?: Address): Promise<SdkResult<TokenBalance>> {
-    const address = holder ?? this.signer.address;
+    const address = holder ?? this.signer?.address;
+
+    if (!address) {
+      return { success: false, error: 'Address or signer required', code: 'INVALID_INPUT' };
+    }
 
     // This would query the tokens program state
     return {
@@ -287,7 +291,11 @@ export class TokensSDK {
     tokenId: TokenId,
     owner?: Address
   ): Promise<SdkResult<NFTInstanceInfo[]>> {
-    const address = owner ?? this.signer.address;
+    const address = owner ?? this.signer?.address;
+
+    if (!address) {
+      return { success: false, error: 'Address or signer required', code: 'INVALID_INPUT' };
+    }
 
     return {
       success: false,
@@ -304,7 +312,11 @@ export class TokensSDK {
     spender: Address,
     owner?: Address
   ): Promise<SdkResult<AllowanceInfo>> {
-    const ownerAddress = owner ?? this.signer.address;
+    const ownerAddress = owner ?? this.signer?.address;
+
+    if (!ownerAddress) {
+      return { success: false, error: 'Address or signer required', code: 'INVALID_INPUT' };
+    }
 
     return {
       success: false,
@@ -324,6 +336,10 @@ export class TokensSDK {
     params: CreateFTParams,
     options?: WaitOptions
   ): Promise<SdkResult<{ tokenId: TokenId; receipt: TxReceipt }>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
+
     // Build transaction
     const authToken = this.signer.createAuthToken(this.programId);
 
@@ -375,6 +391,9 @@ export class TokensSDK {
     params: TransferParams,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:transfer']);
 
     return {
@@ -405,6 +424,9 @@ export class TokensSDK {
     params: MintParams,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:mint']);
 
     return {
@@ -421,6 +443,9 @@ export class TokensSDK {
     params: BurnParams,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:burn']);
 
     return {
@@ -437,6 +462,9 @@ export class TokensSDK {
     params: ApproveParams,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:approve']);
 
     return {
@@ -469,6 +497,9 @@ export class TokensSDK {
    * Pause token (requires owner).
    */
   async pause(tokenId: TokenId, options?: WaitOptions): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:admin']);
 
     return {
@@ -482,6 +513,9 @@ export class TokensSDK {
    * Unpause token (requires owner).
    */
   async unpause(tokenId: TokenId, options?: WaitOptions): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:admin']);
 
     return {
@@ -499,6 +533,9 @@ export class TokensSDK {
     newOwner: Address,
     options?: WaitOptions
   ): Promise<SdkResult<TxReceipt>> {
+    if (!this.signer) {
+      return { success: false, error: 'Signer required', code: 'AUTH_INVALID' };
+    }
     const authToken = this.signer.createScopedToken(this.programId, ['token:admin']);
 
     return {
@@ -556,7 +593,7 @@ export class TokensSDK {
  */
 export function createTokensSDK(
   client: RpcClient,
-  signer: Signer,
+  signer?: Signer,
   programId?: string
 ): TokensSDK {
   return new TokensSDK(client, signer, programId);

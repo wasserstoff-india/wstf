@@ -125,7 +125,7 @@ class NodesModuleImpl implements NodesModule {
         return [];
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const nodes: NodeInfo[] = data.nodes || [];
 
       // Cache the nodes
@@ -154,7 +154,7 @@ class NodesModuleImpl implements NodesModule {
         );
 
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json() as any;
           const nodeInfo: NodeInfo = data.node;
           this.knownNodes.set(nodeId, nodeInfo);
           return nodeInfo;
@@ -224,15 +224,12 @@ class NodesModuleImpl implements NodesModule {
     const startTime = Date.now();
 
     try {
-      const response = await fetch(`${nodeUrl}/health`, {
-        method: 'GET',
-        timeout: 5000,
-      } as any);
+      const response = await fetch(`${nodeUrl}/health`);
 
       const latencyMs = Date.now() - startTime;
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         return {
           healthy: data.status === 'healthy',
           latencyMs,

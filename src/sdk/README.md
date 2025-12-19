@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/wasserstoff-india/wstf/ci.yml?branch=main&style=flat-square)](https://github.com/wasserstoff-india/wstf/actions)
-[![Test Coverage](https://img.shields.io/badge/tests-1261%20passing-brightgreen.svg?style=flat-square)](https://github.com/wasserstoff-india/wstf)
+[![Test Coverage](https://img.shields.io/badge/tests-1369%20passing-brightgreen.svg?style=flat-square)](https://github.com/wasserstoff-india/wstf)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/@wasserstoff/wstf-sdk?style=flat-square)](https://bundlephobia.com/package/@wasserstoff/wstf-sdk)
 
@@ -14,7 +14,7 @@ Type-safe TypeScript/JavaScript SDK for building on **WSTF Chain** - a determini
 This SDK wraps the WSTF Chain RPC / services and gives you:
 
 - **Strict Branded Types** - Compile-time type safety for addresses, IDs, and hashes
-- **Identities & Auth** - WSTFAuth token builder, Ed25519/secp256k1 signers
+- **Identities & Auth** - WSTFAuth token builder, Ed25519/secp256k1 signers (Zero Trust)
 - **Tokens** - FT / NFT / SFT deployment & transfers
 - **State (Vars)** - Authenticated key/value store with namespaces & RBAC
 - **Markets** - On-chain orderbooks, LP grids (arith/geom spreads), trading
@@ -215,6 +215,9 @@ console.log('Signature Algorithm:', signer.sigAlg);
 Signers are used for:
 - Signing **transactions**
 - Signing **WSTFAuth tokens** for HTTP / connector flows
+
+> [!IMPORTANT]
+> **Zero Trust Architecture**: All private keys are generated and held exclusively by the client via the `Signer`. The `Accounts` service only receives and stores the public key and derived address.
 
 ---
 
