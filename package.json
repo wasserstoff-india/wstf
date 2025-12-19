@@ -59,7 +59,8 @@
     "sdk:publish": "cd src/sdk && npm publish --access public",
     "cli:build": "cd src/cli && node build.mjs",
     "cli:publish:dry": "cd src/cli && npm publish --dry-run",
-    "cli:publish": "cd src/cli && npm publish --access public"
+    "cli:publish": "cd src/cli && npm publish --access public",
+    "build:docs": "cd frontend/sdk && npm run build:docs"
   },
   "keywords": [
     "blockchain",

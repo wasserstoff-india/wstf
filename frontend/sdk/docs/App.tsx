@@ -52,11 +52,12 @@ const routes: Record<RouteId, React.FC> = {
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<RouteId>('getting-started');
+  const isProduction = process.env.NODE_ENV === 'production';
 
   const CurrentPage = routes[currentRoute];
 
   return (
-    <WstfProvider config="devnet" autoConnect={true}>
+    <WstfProvider config={isProduction ? 'testnet' : 'devnet'} autoConnect={true}>
       <PageLayout currentRoute={currentRoute} onNavigate={(route) => setCurrentRoute(route as RouteId)}>
         <CurrentPage />
       </PageLayout>
